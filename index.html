@@ -1,82 +1,196 @@
-const estaciones = [
-  {
-    nombre: "Estación Quinzona - Isla Tenglo",
-    lat: -41.486,
-    lng: -72.951,
-    tipo: "normal",
-    urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/quinzona/realtime.txt"
-  },
-  {
-    nombre: "Estación Alcaldía de mar Chacao",
-    lat: -41.8294, 
-    lng: -73.5186,
-    urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/alcamarchacao/realtime.txt"
-  },
-  {
-    nombre: "Estación Capitanía de Puerto de Maullín",
-    lat: -41.6156, 
-    lng: -73.5954,
-    urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/maullin/realtime.txt"
-  },
-  {
-    nombre: "Estación Capitanía de Puerto de Ancud",
-    lat: -41.8662, 
-    lng: -73.8310,
-    urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/ancud/realtime.txt"
-  },
-  {
-    nombre: "Estación Capitanía de Puerto de Aguirre",
-    lat: -45.1646, 
-    lng: -73.5217,
-    urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/aguirre/realtime.txt"
-  },
-  {
-    nombre: "Estación Capitanía de Puerto de Chacabuco",
-    lat: -45.4652, 
-    lng: -72.8212,
-    urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/chacabuco/realtime.txt"
-  },
-  {
-    nombre: "Estación Capitanía de Puerto de Melinka",
-    lat: -43.8965, 
-    lng: -73.7489,
-    urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/melinka/realtime.txt"
-  },
-  {
-    nombre: "Estación Capitanía de Puerto de Quemchi",
-    lat: -42.1448, 
-    lng: -73.4731,
-    urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/Quemchi/realtime.txt"
-  },
-  {
-    nombre: "Estación Capitanía de Puerto de Chonchi",
-    lat: -42.6186, 
-    lng: -73.7689,
-    urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/chonchi/realtime.txt"
-  },
-  {
-    nombre: "Estación Capitanía de Puerto de Chaitén",
-    lat: -42.91467070790407, 
-    lng: -72.71195670730224,
-    urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/chaiten/realtime.txt"
-  },
-  {
-    nombre: "Estación Capitanía de Puerto de Quellón",
-    lat: -43.1205734686238, 
-    lng: -73.62160359499782,
-    urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/quellon/realtime.txt"
-  },
-  {
-    nombre: "Club Náutico Reloncaví",
-    lat: -41.4990,
-    lng: -72.9881,
-    tipo: "weatherlink",
-    urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/2bc9e7ae099849478a8ce1e4c5128e6d"
-  },
-  {
-    nombre: "Nueva Estación WeatherLink",
-    lat: -41.60176084957921, 
-    lng: -72.74957846855708,
-    tipo: "weatherlink",
-    urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/bulletin/81170463-520e-4fd7-87c0-3b35b2d963bb"
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Mapa de Estaciones Meteorológicas</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<style>
+  body { margin:0; padding:0; }
+  #map { height: 100vh; }
+
+  /* Estilo moderno para las tarjetas */
+  .popup-card {
+    font-family: "Segoe UI", Roboto, sans-serif;
+    background: linear-gradient(145deg, #ffffff, #f0f4f8);
+    padding: 1.5em;
+    border-radius: 16px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+    width: 320px;
+    transition: all 0.3s ease;
+    font-size: 1.05em;
   }
+  .popup-card:hover {
+    transform: scale(1.03);
+    box-shadow: 0 8px 22px rgba(0,0,0,0.3);
+  }
+  .popup-card .titulo {
+    font-weight: bold;
+    text-align: center;
+    font-size: 1.3em;
+    color: #1a3d6d;
+    margin-bottom: 0.8em;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.15);
+  }
+  .popup-card .label {
+    font-weight: bold;
+    color: #0077b6;
+    display: inline-block;
+    width: 140px;
+  }
+  .popup-card .dato {
+    margin: 0.5em 0;
+    font-size: 1.05em;
+    color: #222;
+    padding: 6px 10px;
+    border-radius: 8px;
+    background: rgba(0,119,182,0.05);
+  }
+  hr {
+    border: none;
+    height: 1px;
+    background: #ddd;
+    margin: 0.8em 0;
+  }
+
+  /* Estilo del título transparente abajo */
+  .map-title-bottom h2 {
+    font-family: sans-serif;
+    font-size: 18px;
+    color: rgba(255,255,255,0.9);
+    margin: 0;
+    padding: 6px 12px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 6px;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+
+  @media (max-width: 768px) {
+    .popup-card { width: 90%; padding: 1.5em; font-size: 1.1em; }
+    .popup-card .dato { font-size: 1.1em; }
+    .map-title-bottom h2 { font-size: 20px; }
+  }
+</style>
+</head>
+<body>
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+const estaciones = [
+  { nombre: "Estación Quinzona - Isla Tenglo", lat: -41.486, lng: -72.951, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/quinzona/realtime.txt" },
+  { nombre: "Estación Alcaldía de mar Chacao", lat: -41.8294, lng: -73.5186, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/alcamarchacao/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Maullín", lat: -41.6156, lng: -73.5954, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/maullin/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Ancud", lat: -41.8662, lng: -73.8310, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/ancud/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Aguirre", lat: -45.1646, lng: -73.5217, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/aguirre/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Chacabuco", lat: -45.4652, lng: -72.8212, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/chacabuco/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Melinka", lat: -43.8965, lng: -73.7489, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/melinka/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Quemchi", lat: -42.1448, lng: -73.4731, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/Quemchi/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Chonchi", lat: -42.6186, lng: -73.7689, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/chonchi/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Chaitén", lat: -42.91467070790407, lng: -72.71195670730224, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/chaiten/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Quellón", lat: -43.1205734686238, lng: -73.62160359499782, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/quellon/realtime.txt" },
+  { nombre: "Club Náutico Reloncaví", lat: -41.4990, lng: -72.9881, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/2bc9e7ae099849478a8ce1e4c5128e6d" },
+  { nombre: "Nueva Estación WeatherLink", lat: -41.60176084957921, lng: -72.74957846855708, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/bulletin/81170463-520e-4fd7-87c0-3b35b2d963bb" }
+];
+
+function convertirGradosAPuntoCardinal(grados){
+  const direcciones = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+  return direcciones[Math.round(grados/22.5)%16];
+}
+
+async function cargarDatos(urlDatos, nombre){
+  try{
+    const response = await fetch(urlDatos);
+    const texto = await response.text();
+    const lineas = texto.trim().split('\n');
+    const ultimaLinea = lineas[lineas.length-1];
+    const datos = ultimaLinea.trim().split(/\s+/);
+    
+    const direccionGrados = parseFloat(datos[7]||0);
+    const intensidadNudos = datos[5]||0;
+    const direccionCardinal = convertirGradosAPuntoCardinal(direccionGrados);
+
+    return `
+      <div class="popup-card">
+        <div class="titulo">${nombre}</div>
+        <hr>
+        <div class="dato"><span class="label">Día/mes/año:</span> ${datos[0]||"-"}</div>
+        <div class="dato"><span class="label">Hora:</span> ${datos[1]||"-"}</div>
+        <div class="dato"><span class="label">Temperatura:</span> ${datos[2]||"-"} °C</div>
+        <div class="dato"><span class="label">Humedad:</span> ${datos[3]||"-"} %</div>
+        <div class="dato"><span class="label">Punto de rocío:</span> ${datos[4]||"-"} °C</div>
+        <div class="dato"><span class="label">Presión:</span> ${datos[10]||"-"} hPa</div>
+        <div class="dato"><span class="label">Viento:</span> ${direccionGrados}° (${direccionCardinal}) ${intensidadNudos} nds</div>
+        <div class="dato"><span class="label">Rachas:</span> ${datos[40]||"-"} nds</div>
+      </div>
+    `;
+  }catch(e){
+    console.error(e);
+    return "<div class='popup-card'>Error al cargar los datos.</div>";
+  }
+}
+
+async function cargarDatosWeatherLink(urlDatos, nombre){
+  try{
+    const response = await fetch(urlDatos);
+    let datos = {};
+    try { datos = await response.json(); } catch(e){ datos={}; }
+    const dir = datos.windDirection||0;
+    const spd = datos.wind||0;
+    const racha = datos.gust||0;
+    return `
+      <div class="popup-card">
+        <div class="titulo">${nombre}</div>
+        <hr>
+        <div class="dato"><span class="label">Temperatura:</span> ${datos.temperature||"-"} °C</div>
+        <div class="dato"><span class="label">Humedad:</span> ${datos.humidity||"-"} %</div>
+        <div class="dato"><span class="label">Presión:</span> ${datos.barometer||"-"} hPa</div>
+        <div class="dato"><span class="label">Viento:</span> ${dir}° (${convertirGradosAPuntoCardinal(dir)}) ${spd} nds</div>
+        <div class="dato"><span class="label">Rachas:</span> ${racha} nds</div>
+        <div class="dato"><span class="label">Precipitación:</span> ${datos.rain||"-"} mm</div>
+      </div>
+    `;
+  }catch(e){
+    console.error(e);
+    return "<div class='popup-card'>Error al cargar WeatherLink</div>";
+  }
+}
+
+const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19 });
+const googleSat = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', { maxZoom: 20, attribution: '© Google' });
+
+const map = L.map('map',{layers:[osm]}).setView([-41.5,-73],7);
+L.control.layers({"Mapa":osm,"Satélite Google":googleSat},null,{position:'topleft'}).addTo(map);
+
+// Título abajo
+const tituloControlBottom = L.control({position:'bottomleft'});
+tituloControlBottom.onAdd=function(map){
+  const div = L.DomUtil.create('div','map-title-bottom');
+  div.innerHTML='<h2>Estaciones Meteorológicas Automáticas</h2>';
+  return div;
+};
+tituloControlBottom.addTo(map);
+
+estaciones.forEach(est=>{
+  const marker = L.circleMarker([est.lat,est.lng],{
+    radius: 8,
+    color: est.tipo==="weatherlink"?"#1E90FF":"#FF4500",
+    fillColor: est.tipo==="weatherlink"?"#1E90FF":"#FF4500",
+    fillOpacity: 0.8
+  }).addTo(map);
+
+  marker.bindTooltip(est.nombre,{permanent:false,direction:'top',offset:[0,-10]});
+
+  marker.on('click',async()=>{
+    let contenido;
+    if(est.tipo==="weatherlink"){
+      contenido = await cargarDatosWeatherLink(est.urlDatos,est.nombre);
+    }else{
+      contenido = await cargarDatos(est.urlDatos,est.nombre);
+    }
+    marker.bindPopup(contenido).openPopup();
+  });
+});
+</script>
+</body>
+</html>
