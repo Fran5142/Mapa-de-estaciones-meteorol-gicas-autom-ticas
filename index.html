@@ -29,6 +29,20 @@
     background: rgba(255,255,255,0.8);
     border-radius: 5px;
   }
+
+  /* Responsivo para móviles */
+  @media (max-width: 768px) {
+    .popup-card {
+      width: 300px;
+      padding: 1.5em;
+    }
+    .popup-card .dato {
+      font-size: 1.2em;
+    }
+    .map-title h2 {
+      font-size: 22px;
+    }
+  }
 </style>
 </head>
 <body>
@@ -186,17 +200,16 @@ async function cargarDatosWeatherLink(urlDatos, nombre) {
   }
 }
 
-// Crear mapas base
-const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 });
-const satelite = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
-  maxZoom: 20,
-  subdomains:['mt0','mt1','mt2','mt3']
-});
+// Crear mapa con capas
+const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19 });
+const satelite = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom:17 }); // Ejemplo satélite
 
-// Crear mapa
 const map = L.map('map', { layers: [osm] }).setView([-41.5, -73], 6);
 
-// Título del mapa arriba derecha
+// Control de capas
+L.control.layers({ "Mapa": osm, "Satelital": satelite }, null, { position: 'bottomright' }).addTo(map);
+
+// Título al lado derecho
 const tituloControl = L.control({position: 'topright'});
 tituloControl.onAdd = function(map) {
     const div = L.DomUtil.create('div', 'map-title');
@@ -204,10 +217,6 @@ tituloControl.onAdd = function(map) {
     return div;
 };
 tituloControl.addTo(map);
-
-// Control de capas en esquina inferior derecha
-const baseMaps = { "Mapa": osm, "Satelital": satelite };
-L.control.layers(baseMaps, null, {position: 'bottomright'}).addTo(map);
 
 // Colocar marcadores como puntos
 estaciones.forEach(est => {
