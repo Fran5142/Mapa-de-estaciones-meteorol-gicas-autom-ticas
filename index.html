@@ -87,10 +87,10 @@ const estaciones = [
   { nombre: "Estación Capitanía de Puerto de Melinka", lat: -43.8965, lng: -73.7489, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/melinka/realtime.txt" },
   { nombre: "Estación Capitanía de Puerto de Quemchi", lat: -42.1448, lng: -73.4731, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/Quemchi/realtime.txt" },
   { nombre: "Estación Capitanía de Puerto de Chonchi", lat: -42.6186, lng: -73.7689, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/chonchi/realtime.txt" },
-  { nombre: "Estación Capitanía de Puerto de Chaitén", lat: -42.91467070790407, lng: -72.71195670730224, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/chaiten/realtime.txt" },
-  { nombre: "Estación Capitanía de Puerto de Quellón", lat: -43.1205734686238, lng: -73.62160359499782, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/quellon/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Chaitén", lat: -42.9147, lng: -72.7120, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/chaiten/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Quellón", lat: -43.1206, lng: -73.6216, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/quellon/realtime.txt" },
   { nombre: "Club Náutico Reloncaví", lat: -41.4990, lng: -72.9881, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/2bc9e7ae099849478a8ce1e4c5128e6d" },
-  { nombre: "Nueva Estación WeatherLink", lat: -41.60176084957921, lng: -72.74957846855708, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/bulletin/81170463-520e-4fd7-87c0-3b35b2d963bb" }
+  { nombre: "Nueva Estación WeatherLink", lat: -41.6018, lng: -72.7496, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/bulletin/81170463-520e-4fd7-87c0-3b35b2d963bb" }
 ];
 
 function convertirGradosAPuntoCardinal(grados){
@@ -112,16 +112,17 @@ async function cargarDatos(urlDatos, nombre){
 
     return `
       <div class="popup-card">
-        <div class="titulo">${nombre}</div>
+        <div class="titulo">📡 ${nombre}</div>
         <hr>
-        <div class="dato"><span class="label">Día/mes/año:</span> ${datos[0]||"-"}</div>
-        <div class="dato"><span class="label">Hora:</span> ${datos[1]||"-"}</div>
-        <div class="dato"><span class="label">Temperatura:</span> ${datos[2]||"-"} °C</div>
-        <div class="dato"><span class="label">Humedad:</span> ${datos[3]||"-"} %</div>
-        <div class="dato"><span class="label">Punto de rocío:</span> ${datos[4]||"-"} °C</div>
-        <div class="dato"><span class="label">Presión:</span> ${datos[10]||"-"} hPa</div>
-        <div class="dato"><span class="label">Viento:</span> ${direccionGrados}° (${direccionCardinal}) ${intensidadNudos} nds</div>
-        <div class="dato"><span class="label">Rachas:</span> ${datos[40]||"-"} nds</div>
+        <div class="dato"><span class="label">📅 Día/mes/año:</span> ${datos[0]||"-"}</div>
+        <div class="dato"><span class="label">🕒 Hora:</span> ${datos[1]||"-"}</div>
+        <div class="dato"><span class="label">🌡 Temperatura:</span> ${datos[2]||"-"} °C</div>
+        <div class="dato"><span class="label">💧 Humedad:</span> ${datos[3]||"-"} %</div>
+        <div class="dato"><span class="label">🌫 Punto de rocío:</span> ${datos[4]||"-"} °C</div>
+        <div class="dato"><span class="label">🧭 Presión:</span> ${datos[10]||"-"} hPa</div>
+        <div class="dato"><span class="label">🌬 Viento:</span> ${direccionGrados}° (${direccionCardinal}) ${intensidadNudos} nds</div>
+        <div class="dato"><span class="label">💨 Rachas:</span> ${datos[40]||"-"} nds</div>
+        <div class="dato"><span class="label">🌧️ Precipitación:</span> ${datos[9]||"-"} mm</div>
       </div>
     `;
   }catch(e){
@@ -140,14 +141,14 @@ async function cargarDatosWeatherLink(urlDatos, nombre){
     const racha = datos.gust||0;
     return `
       <div class="popup-card">
-        <div class="titulo">${nombre}</div>
+        <div class="titulo">🌐 ${nombre}</div>
         <hr>
-        <div class="dato"><span class="label">Temperatura:</span> ${datos.temperature||"-"} °C</div>
-        <div class="dato"><span class="label">Humedad:</span> ${datos.humidity||"-"} %</div>
-        <div class="dato"><span class="label">Presión:</span> ${datos.barometer||"-"} hPa</div>
-        <div class="dato"><span class="label">Viento:</span> ${dir}° (${convertirGradosAPuntoCardinal(dir)}) ${spd} nds</div>
-        <div class="dato"><span class="label">Rachas:</span> ${racha} nds</div>
-        <div class="dato"><span class="label">Precipitación:</span> ${datos.rain||"-"} mm</div>
+        <div class="dato"><span class="label">🌡 Temperatura:</span> ${datos.temperature||"-"} °C</div>
+        <div class="dato"><span class="label">💧 Humedad:</span> ${datos.humidity||"-"} %</div>
+        <div class="dato"><span class="label">🧭 Presión:</span> ${datos.barometer||"-"} hPa</div>
+        <div class="dato"><span class="label">🌬 Viento:</span> ${dir}° (${convertirGradosAPuntoCardinal(dir)}) ${spd} nds</div>
+        <div class="dato"><span class="label">💨 Rachas:</span> ${racha} nds</div>
+        <div class="dato"><span class="label">🌧️ Precipitación:</span> ${datos.rain||"-"} mm</div>
       </div>
     `;
   }catch(e){
@@ -171,12 +172,14 @@ tituloControlBottom.onAdd=function(map){
 };
 tituloControlBottom.addTo(map);
 
+// Marcadores
 estaciones.forEach(est=>{
   const marker = L.circleMarker([est.lat,est.lng],{
-    radius: 8,
+    radius: 10,
     color: est.tipo==="weatherlink"?"#1E90FF":"#FF4500",
     fillColor: est.tipo==="weatherlink"?"#1E90FF":"#FF4500",
-    fillOpacity: 0.8
+    fillOpacity: 0.6,
+    weight: 2
   }).addTo(map);
 
   marker.bindTooltip(est.nombre,{permanent:false,direction:'top',offset:[0,-10]});
