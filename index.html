@@ -83,25 +83,29 @@
     .map-title-bottom h2 { font-size: 20px; }
   }
 
-  /* Para móviles muy pequeños */
-  @media (max-width: 480px) {
+/* Para móviles muy pequeños */
+@media (max-width: 480px) {
     .popup-card {
-        width: 98%;
-        padding: 3em;
-        font-size: 1.6em;
+        width: 95% !important;       /* ocupa casi toda la pantalla */
+        max-width: none !important;  /* quitar límite de Leaflet */
+        padding: 3em !important;     /* mucho espacio */
+        font-size: 1.8em !important; /* texto grande */
     }
-    .popup-card .titulo { font-size: 2em; }
+    .popup-card .titulo {
+        font-size: 2.2em !important; /* título enorme */
+    }
     .popup-card .dato {
-        font-size: 1.5em;
-        padding: 12px 16px;
+        font-size: 1.6em !important;
+        padding: 14px 16px !important;
         flex-direction: column;
         align-items: flex-start;
     }
     .popup-card .label {
-        width: 100%;
-        margin-bottom: 4px;
+        width: 100% !important;
+        margin-bottom: 6px;
     }
-  }
+}
+
 </style>
 </head>
 <body>
@@ -240,7 +244,5 @@ estaciones.forEach(est=>{
 </script>
 </body>
 </html>
-
-
 
 
