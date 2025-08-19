@@ -44,9 +44,6 @@
     padding: 6px 10px;
     border-radius: 8px;
     background: rgba(0,119,182,0.05);
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
   }
   hr {
     border: none;
@@ -68,44 +65,11 @@
     box-shadow: 0 2px 6px rgba(0,0,0,0.2);
   }
 
-  /* Para tablets y móviles grandes */
-  @media (max-width: 1000px) {
-    .popup-card {
-        width: 100%;
-        padding: 4.5em;
-        font-size: 2.4em;
-    }
-    .popup-card .dato {
-        font-size: 1.3em;
-        padding: 10px 14px;
-    }
-    .popup-card .titulo { font-size: 1.8em; }
+  @media (max-width: 768px) {
+    .popup-card { width: 90%; padding: 1.5em; font-size: 1.1em; }
+    .popup-card .dato { font-size: 1.1em; }
     .map-title-bottom h2 { font-size: 20px; }
   }
-
-/* Para móviles muy pequeños */
-@media (max-width: 480px) {
-    .popup-card {
-        width: 95% !important;       /* ocupa casi toda la pantalla */
-        max-width: none !important;  /* quitar límite de Leaflet */
-        padding: 3em !important;     /* mucho espacio */
-        font-size: 1.8em !important; /* texto grande */
-    }
-    .popup-card .titulo {
-        font-size: 2.2em !important; /* título enorme */
-    }
-    .popup-card .dato {
-        font-size: 1.6em !important;
-        padding: 14px 16px !important;
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    .popup-card .label {
-        width: 100% !important;
-        margin-bottom: 6px;
-    }
-}
-
 </style>
 </head>
 <body>
@@ -141,21 +105,17 @@ async function cargarDatos(urlDatos, nombre){
     const lineas = texto.trim().split('\n');
     const ultimaLinea = lineas[lineas.length-1];
     const datos = ultimaLinea.trim().split(/\s+/);
-
+    
     const direccionGrados = parseFloat(datos[7]||0);
     const intensidadNudos = datos[5]||0;
     const direccionCardinal = convertirGradosAPuntoCardinal(direccionGrados);
-
-    const fechaActual = new Date();
-    const fechaFormateada = fechaActual.toLocaleDateString('es-CL', { day:'2-digit', month:'2-digit', year:'numeric' });
-    const horaFormateada = fechaActual.toLocaleTimeString('es-CL', { hour:'2-digit', minute:'2-digit' });
 
     return `
       <div class="popup-card">
         <div class="titulo">📡 ${nombre}</div>
         <hr>
-        <div class="dato"><span class="label">📅 Día/mes/año:</span> ${fechaFormateada}</div>
-        <div class="dato"><span class="label">🕒 Hora:</span> ${horaFormateada}</div>
+        <div class="dato"><span class="label">📅 Día/mes/año:</span> ${datos[0]||"-"}</div>
+        <div class="dato"><span class="label">🕒 Hora:</span> ${datos[1]||"-"}</div>
         <div class="dato"><span class="label">🌡 Temperatura:</span> ${datos[2]||"-"} °C</div>
         <div class="dato"><span class="label">💧 Humedad:</span> ${datos[3]||"-"} %</div>
         <div class="dato"><span class="label">🌫 Punto de rocío:</span> ${datos[4]||"-"} °C</div>
@@ -179,17 +139,10 @@ async function cargarDatosWeatherLink(urlDatos, nombre){
     const dir = datos.windDirection||0;
     const spd = datos.wind||0;
     const racha = datos.gust||0;
-
-    const fechaActual = new Date();
-    const fechaFormateada = fechaActual.toLocaleDateString('es-CL', { day:'2-digit', month:'2-digit', year:'numeric' });
-    const horaFormateada = fechaActual.toLocaleTimeString('es-CL', { hour:'2-digit', minute:'2-digit' });
-
     return `
       <div class="popup-card">
         <div class="titulo">🌐 ${nombre}</div>
         <hr>
-        <div class="dato"><span class="label">📅 Día/mes/año:</span> ${fechaFormateada}</div>
-        <div class="dato"><span class="label">🕒 Hora:</span> ${horaFormateada}</div>
         <div class="dato"><span class="label">🌡 Temperatura:</span> ${datos.temperature||"-"} °C</div>
         <div class="dato"><span class="label">💧 Humedad:</span> ${datos.humidity||"-"} %</div>
         <div class="dato"><span class="label">🧭 Presión:</span> ${datos.barometer||"-"} hPa</div>
@@ -244,6 +197,4 @@ estaciones.forEach(est=>{
 </script>
 </body>
 </html>
-
-
 
