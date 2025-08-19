@@ -44,6 +44,9 @@
     padding: 6px 10px;
     border-radius: 8px;
     background: rgba(0,119,182,0.05);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
   }
   hr {
     border: none;
@@ -65,12 +68,12 @@
     box-shadow: 0 2px 6px rgba(0,0,0,0.2);
   }
 
-  /* Media query para pantallas móviles: tarjetas más grandes */
+  /* Para tablets y móviles grandes */
   @media (max-width: 768px) {
     .popup-card {
-        width: 95%;           /* Más ancho */
-        padding: 2.5em;       /* Más espacio interno */
-        font-size: 1.4em;     /* Texto más grande */
+        width: 95%;
+        padding: 2.5em;
+        font-size: 1.4em;
     }
     .popup-card .dato {
         font-size: 1.3em;
@@ -78,6 +81,26 @@
     }
     .popup-card .titulo { font-size: 1.8em; }
     .map-title-bottom h2 { font-size: 20px; }
+  }
+
+  /* Para móviles muy pequeños */
+  @media (max-width: 480px) {
+    .popup-card {
+        width: 98%;
+        padding: 3em;
+        font-size: 1.6em;
+    }
+    .popup-card .titulo { font-size: 2em; }
+    .popup-card .dato {
+        font-size: 1.5em;
+        padding: 12px 16px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .popup-card .label {
+        width: 100%;
+        margin-bottom: 4px;
+    }
   }
 </style>
 </head>
@@ -119,7 +142,6 @@ async function cargarDatos(urlDatos, nombre){
     const intensidadNudos = datos[5]||0;
     const direccionCardinal = convertirGradosAPuntoCardinal(direccionGrados);
 
-    // Fecha y hora de última conexión segura
     const fechaActual = new Date();
     const fechaFormateada = fechaActual.toLocaleDateString('es-CL', { day:'2-digit', month:'2-digit', year:'numeric' });
     const horaFormateada = fechaActual.toLocaleTimeString('es-CL', { hour:'2-digit', minute:'2-digit' });
