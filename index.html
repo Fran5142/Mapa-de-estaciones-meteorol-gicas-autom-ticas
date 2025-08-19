@@ -65,10 +65,26 @@
     box-shadow: 0 2px 6px rgba(0,0,0,0.2);
   }
 
+  /* Media query agresivo para móviles */
   @media (max-width: 768px) {
-    .popup-card { width: 90%; padding: 1.5em; font-size: 1.1em; }
-    .popup-card .dato { font-size: 1.1em; }
-    .map-title-bottom h2 { font-size: 20px; }
+    .popup-card {
+      width: 98% !important;
+      max-width: none !important;
+      padding: 3em !important;
+      font-size: 1.8em !important;
+    }
+    .popup-card .titulo {
+      font-size: 2.5em !important;
+    }
+    .popup-card .dato {
+      font-size: 2em !important;
+      padding: 16px 20px !important;
+    }
+    .popup-card .label {
+      width: 100% !important;
+      margin-bottom: 6px;
+    }
+    .map-title-bottom h2 { font-size: 22px; }
   }
 </style>
 </head>
@@ -197,4 +213,3 @@ estaciones.forEach(est=>{
 </script>
 </body>
 </html>
-
