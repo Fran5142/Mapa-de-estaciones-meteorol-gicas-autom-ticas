@@ -66,26 +66,26 @@
   }
 
   /* Media query agresivo para móviles */
-  @media (max-width: 768px) {
-    .popup-card {
-      width: 98% !important;
-      max-width: none !important;
-      padding: 3em !important;
-      font-size: 1.8em !important;
-    }
-    .popup-card .titulo {
-      font-size: 2.5em !important;
-    }
-    .popup-card .dato {
-      font-size: 2em !important;
-      padding: 16px 20px !important;
-    }
-    .popup-card .label {
-      width: 100% !important;
-      margin-bottom: 6px;
-    }
-    .map-title-bottom h2 { font-size: 22px; }
+@media (max-width: 768px) {
+  .popup-card {
+    width: 95%;       /* ocupa casi toda la pantalla */
+    padding: 2em;     /* más espacio interno */
+    font-size: 1.4em; /* fuente más grande */
   }
+  .popup-card .titulo {
+    font-size: 1.8em; /* título más grande */
+  }
+  .popup-card .dato {
+    font-size: 1.3em; /* datos más legibles */
+    padding: 10px 14px;
+  }
+  .popup-card .label {
+    width: 150px; /* un poco más de espacio para los labels */
+  }
+  .map-title-bottom h2 {
+    font-size: 22px;
+  }
+}
 </style>
 </head>
 <body>
