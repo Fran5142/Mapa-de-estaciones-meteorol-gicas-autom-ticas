@@ -2,10 +2,10 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Mapa de Estaciones Meteorológicas</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 <style>
+  body { margin:0; padding:0; }
   #map { height: 100vh; }
 
   /* Estilo moderno para las tarjetas */
@@ -52,7 +52,7 @@
     margin: 0.8em 0;
   }
 
-  /* Título transparente abajo */
+  /* Estilo del título transparente abajo */
   .map-title-bottom h2 {
     font-family: sans-serif;
     font-size: 18px;
@@ -65,70 +65,151 @@
     box-shadow: 0 2px 6px rgba(0,0,0,0.2);
   }
 
-  /* En móviles: tarjeta mucho más grande */
-  @media (max-width: 768px) {
-    .leaflet-popup-content-wrapper {
-      max-width: 95vw !important;
-    }
-    .leaflet-popup-content {
-      width: 95vw !important;
-      margin: 0 !important;
-    }
-
-    .popup-card {
-      width: 100% !important;
-      padding: 2em;
-      font-size: 1.6em; /* más grande */
-    }
-    .popup-card .titulo {
-      font-size: 2em;
-    }
-    .popup-card .dato {
-      font-size: 1.5em;
-      padding: 12px 16px;
-    }
-    .popup-card .label {
-      width: 160px;
-    }
-    .map-title-bottom h2 {
-      font-size: 24px;
-    }
+  /* Media query agresivo para móviles */
+@media (max-width: 768px) {
+  .popup-card {
+    width: 95%;       /* ocupa casi toda la pantalla */
+    padding: 2em;     /* más espacio interno */
+    font-size: 1.4em; /* fuente más grande */
   }
+  .popup-card .titulo {
+    font-size: 1.8em; /* título más grande */
+  }
+  .popup-card .dato {
+    font-size: 1.3em; /* datos más legibles */
+    padding: 10px 14px;
+  }
+  .popup-card .label {
+    width: 150px; /* un poco más de espacio para los labels */
+  }
+  .map-title-bottom h2 {
+    font-size: 22px;
+  }
+}
 </style>
 </head>
 <body>
-
 <div id="map"></div>
-
-<!-- Título inferior -->
-<div class="map-title-bottom" style="position:absolute; bottom:10px; left:50%; transform:translateX(-50%); z-index:1000;">
-  <h2>Estaciones Meteorológicas</h2>
-</div>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
-  var map = L.map('map').setView([-41.486, -72.951], 12);
+const estaciones = [
+  { nombre: "Estación Quinzona - Isla Tenglo", lat: -41.486, lng: -72.951, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/quinzona/realtime.txt" },
+  { nombre: "Estación Alcaldía de mar Chacao", lat: -41.8294, lng: -73.5186, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/alcamarchacao/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Maullín", lat: -41.6156, lng: -73.5954, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/maullin/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Ancud", lat: -41.8662, lng: -73.8310, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/ancud/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Aguirre", lat: -45.1646, lng: -73.5217, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/aguirre/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Chacabuco", lat: -45.4652, lng: -72.8212, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/chacabuco/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Melinka", lat: -43.8965, lng: -73.7489, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/melinka/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Quemchi", lat: -42.1448, lng: -73.4731, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/Quemchi/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Chonchi", lat: -42.6186, lng: -73.7689, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/chonchi/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Chaitén", lat: -42.9147, lng: -72.7120, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/chaiten/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Quellón", lat: -43.1206, lng: -73.6216, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/quellon/realtime.txt" },
+  { nombre: "Club Náutico Reloncaví", lat: -41.4990, lng: -72.9881, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/2bc9e7ae099849478a8ce1e4c5128e6d" },
+  { nombre: "Nueva Estación WeatherLink", lat: -41.6018, lng: -72.7496, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/bulletin/81170463-520e-4fd7-87c0-3b35b2d963bb" }
+];
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 18,
-    attribution: '&copy; OpenStreetMap'
+function convertirGradosAPuntoCardinal(grados){
+  const direcciones = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+  return direcciones[Math.round(grados/22.5)%16];
+}
+
+async function cargarDatos(urlDatos, nombre){
+  try{
+    const response = await fetch(urlDatos);
+    const texto = await response.text();
+    const lineas = texto.trim().split('\n');
+    const ultimaLinea = lineas[lineas.length-1];
+    const datos = ultimaLinea.trim().split(/\s+/);
+    
+    const direccionGrados = parseFloat(datos[7]||0);
+    const intensidadNudos = datos[5]||0;
+    const direccionCardinal = convertirGradosAPuntoCardinal(direccionGrados);
+
+    return `
+      <div class="popup-card">
+        <div class="titulo">📡 ${nombre}</div>
+        <hr>
+        <div class="dato"><span class="label">📅 Día/mes/año:</span> ${datos[0]||"-"}</div>
+        <div class="dato"><span class="label">🕒 Hora:</span> ${datos[1]||"-"}</div>
+        <div class="dato"><span class="label">🌡 Temperatura:</span> ${datos[2]||"-"} °C</div>
+        <div class="dato"><span class="label">💧 Humedad:</span> ${datos[3]||"-"} %</div>
+        <div class="dato"><span class="label">🌫 Punto de rocío:</span> ${datos[4]||"-"} °C</div>
+        <div class="dato"><span class="label">🧭 Presión:</span> ${datos[10]||"-"} hPa</div>
+        <div class="dato"><span class="label">🌬 Viento:</span> ${direccionGrados}° (${direccionCardinal}) ${intensidadNudos} nds</div>
+        <div class="dato"><span class="label">💨 Rachas:</span> ${datos[40]||"-"} nds</div>
+        <div class="dato"><span class="label">🌧️ Precipitación:</span> ${datos[9]||"-"} mm</div>
+      </div>
+    `;
+  }catch(e){
+    console.error(e);
+    return "<div class='popup-card'>Error al cargar los datos.</div>";
+  }
+}
+
+async function cargarDatosWeatherLink(urlDatos, nombre){
+  try{
+    const response = await fetch(urlDatos);
+    let datos = {};
+    try { datos = await response.json(); } catch(e){ datos={}; }
+    const dir = datos.windDirection||0;
+    const spd = datos.wind||0;
+    const racha = datos.gust||0;
+    return `
+      <div class="popup-card">
+        <div class="titulo">🌐 ${nombre}</div>
+        <hr>
+        <div class="dato"><span class="label">🌡 Temperatura:</span> ${datos.temperature||"-"} °C</div>
+        <div class="dato"><span class="label">💧 Humedad:</span> ${datos.humidity||"-"} %</div>
+        <div class="dato"><span class="label">🧭 Presión:</span> ${datos.barometer||"-"} hPa</div>
+        <div class="dato"><span class="label">🌬 Viento:</span> ${dir}° (${convertirGradosAPuntoCardinal(dir)}) ${spd} nds</div>
+        <div class="dato"><span class="label">💨 Rachas:</span> ${racha} nds</div>
+        <div class="dato"><span class="label">🌧️ Precipitación:</span> ${datos.rain||"-"} mm</div>
+      </div>
+    `;
+  }catch(e){
+    console.error(e);
+    return "<div class='popup-card'>Error al cargar WeatherLink</div>";
+  }
+}
+
+const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19 });
+const googleSat = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', { maxZoom: 20, attribution: '© Google' });
+
+const map = L.map('map',{layers:[osm]}).setView([-41.5,-73],7);
+L.control.layers({"Mapa":osm,"Satélite Google":googleSat},null,{position:'topleft'}).addTo(map);
+
+// Título abajo
+const tituloControlBottom = L.control({position:'bottomleft'});
+tituloControlBottom.onAdd=function(map){
+  const div = L.DomUtil.create('div','map-title-bottom');
+  div.innerHTML='<h2>Estaciones Meteorológicas Automáticas</h2>';
+  return div;
+};
+tituloControlBottom.addTo(map);
+
+// Marcadores
+estaciones.forEach(est=>{
+  const marker = L.circleMarker([est.lat,est.lng],{
+    radius: 10,
+    color: est.tipo==="weatherlink"?"#1E90FF":"#FF4500",
+    fillColor: est.tipo==="weatherlink"?"#1E90FF":"#FF4500",
+    fillOpacity: 0.6,
+    weight: 2
   }).addTo(map);
 
-  var popupContent = `
-    <div class="popup-card">
-      <div class="titulo">Estación Quinzona</div>
-      <div class="dato"><span class="label">Temperatura:</span> 15°C</div>
-      <div class="dato"><span class="label">Humedad:</span> 82%</div>
-      <div class="dato"><span class="label">Viento:</span> 12 km/h</div>
-      <hr>
-      <div class="dato"><span class="label">Última actualización:</span> 19/08/2025 18:30</div>
-    </div>
-  `;
+  marker.bindTooltip(est.nombre,{permanent:false,direction:'top',offset:[0,-10]});
 
-  L.marker([-41.486, -72.951]).addTo(map)
-    .bindPopup(popupContent)
-    .openPopup();
+  marker.on('click',async()=>{
+    let contenido;
+    if(est.tipo==="weatherlink"){
+      contenido = await cargarDatosWeatherLink(est.urlDatos,est.nombre);
+    }else{
+      contenido = await cargarDatos(est.urlDatos,est.nombre);
+    }
+    marker.bindPopup(contenido).openPopup();
+  });
+});
 </script>
-
 </body>
 </html>
