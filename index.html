@@ -50,6 +50,7 @@
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
+
 // ======= LISTA COMPLETA DE ESTACIONES =======  
 const estaciones = [
 
@@ -90,7 +91,7 @@ const estaciones = [
   { nombre: "Cofradía Náutica del Pacífico (Algarrobo)", lat: -45.49, lng: -83.98, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/9fa531d050e648a9a8aa6bb7026c3902" },
 
 	
-// ======= TERZONA =======
+// ======= SEZONA =======
 
   { nombre: "Estación Capitanía de Puerto de Corral", lat: -39.887789132819336, lng: -73.42781070392009, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/corral/realtime.txt" },   
   { nombre: "Estación Capitanía de Puerto de Carahue", lat: -38.788423273400966, lng: -73.39718655933679, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/carahue/realtime.txt" }, 
@@ -101,9 +102,13 @@ const estaciones = [
   { nombre: "Estación Capitanía de Puerto de Lirquén", lat: -36.71136815014315, lng: -72.97771208216336, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/lirquen/realtime.txt" }, 
   { nombre: "Estación Capitanía de Puerto de Constitución", lat: -35.32437344009416, lng: -72.4084436325508, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/constitucion/realtime.txt" },
 
+
+  { nombre: "Estación Faro Isla Quiriquina", lat: -36.611578766421566, lng: -73.05240787211854, tipo: "italca", urlDatos: "https://api.weather.com/v2/pws/observations/current?apiKey=e1f10a1e78da46f5b10a1e78da96f525&stationId=ITALCA20&numericPrecision=decimal&format=json&units=e" },
+
+
 // ======= QUINZONA =======
 
-  { nombre: "Estación Quinzona - Isla Tenglo", lat: -41.486, lng: -72.951, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/quinzona/realtime.txt" },
+  { nombre: "Estación Quinzona - Isla Tenglo", lat: -41.48661084352241, lng: -72.9512652000025, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/quinzona/realtime.txt" },  
   { nombre: "Estación Alcaldía de mar Chacao", lat: -41.8294, lng: -73.5186, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/alcamarchacao/realtime.txt" },
   { nombre: "Estación Capitanía de Puerto de Maullín", lat: -41.6156, lng: -73.5954, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/maullin/realtime.txt" },
   { nombre: "Estación Capitanía de Puerto de Ancud", lat: -41.8662, lng: -73.8310, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/ancud/realtime.txt" },
@@ -135,7 +140,7 @@ const estaciones = [
   { nombre: "Estación Capitanía de Puerto Edén", lat: -49.0745, lng: -74.2545, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/eden/realtime.txt" },
   { nombre: "Estación Alcaldía de mar corrientes", lat: -54.5919, lng: -68.2040, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/corrientes/realtime.txt" },
 
-  { nombre: "Muelle Capitán Guillermos Punta Arenas", lat: -55.4990, lng: -83.9881, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/aa24908f6c68472ba163e55765986705" },
+  { nombre: "Muelle Capitán Guillermos Punta Arenas", lat: -55.4990, lng: -83.9881, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/aa24908f6c68472ba163e55765986705" }, 
 
 
 ];
@@ -187,6 +192,7 @@ const grupoSezona = [
 "Estación Centro Meteorológico de Talcahuano",
 "Estación Capitanía de Puerto de Lirquén",
 "Estación Capitanía de Puerto de Constitución",
+"Estación Faro Isla Quiriquina",
 
 ];
 
@@ -223,12 +229,50 @@ const grupoTerzona = [
   // Agrega aquí tus estaciones de Terzona
 ];
 
+
 // ======= FUNCIONES AUXILIARES =======
 function convertirGradosAPuntoCardinal(grados){
   const direcciones = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
   return direcciones[Math.round(grados/22.5)%16];
 }
 
+// Función especial para ITALCA20
+async function cargarDatosITALCA20(urlDatos, nombre){
+  try{
+    const proxyUrl = 'https://corsproxy.io/?url=' + encodeURIComponent(urlDatos);
+    const response = await fetch(proxyUrl);
+    const data = await response.json();
+    const obs = data.observations[0];
+    const fechaObj = new Date(obs.obsTimeLocal);
+    const dia = String(fechaObj.getDate()).padStart(2,'0');
+    const mes = String(fechaObj.getMonth()+1).padStart(2,'0');
+    const año = fechaObj.getFullYear();
+    const hora = String(fechaObj.getHours()).padStart(2,'0') + ':' + String(fechaObj.getMinutes()).padStart(2,'0');
+    const direccionGrados = obs.winddir || 0;
+    const direccionCardinal = convertirGradosAPuntoCardinal(direccionGrados);
+    const velocidadNudos = (obs.imperial.windSpeed*0.868976).toFixed(1);
+    const rachasNudos = (obs.imperial.windGust*0.868976).toFixed(1);
+    const temperaturaC = ((obs.imperial.temp-32)*5/9).toFixed(1);
+    const puntoRocioC = ((obs.imperial.dewpt-32)*5/9).toFixed(1);
+    const presionhPa = (obs.imperial.pressure*33.8639).toFixed(1);
+    const humedad = obs.humidity;
+
+    return `
+      <div class="popup-card">
+        <div class="titulo">📡 ${nombre}</div>
+        <div class="dato" style="background:#e6f7ff;">📅 Última actualización: ${dia}/${mes}/${año} ${hora}</div>
+        <hr>
+        <div class="dato"><span class="label">🌡 Temperatura:</span> ${temperaturaC} °C</div>
+        <div class="dato"><span class="label">💧 Humedad:</span> ${humedad} %</div>
+        <div class="dato"><span class="label">🌫 Punto de rocío:</span> ${puntoRocioC} °C</div>
+        <div class="dato"><span class="label">🧭 Presión:</span> ${presionhPa} hPa</div>
+        <div class="dato"><span class="label">🌬 Viento:</span> ${direccionGrados}° (${direccionCardinal}) ${velocidadNudos} nds</div>
+        <div class="dato"><span class="label">💨 Rachas:</span> ${rachasNudos} nds</div>
+      </div>`;
+  }catch(e){ console.error(e); return "<div class='popup-card'>Error al cargar datos ITALCA20</div>"; }
+}
+
+// FUNCION CUMULUS
 async function cargarDatos(urlDatos, nombre){
   try{
     const response = await fetch(urlDatos);
@@ -257,6 +301,7 @@ async function cargarDatos(urlDatos, nombre){
   }catch(e){ console.error(e); return "<div class='popup-card'>Error al cargar los datos.</div>"; }
 }
 
+//FUNCION WEATHERLINK
 async function cargarDatosWeatherLink(urlDatos, nombre){
   try{
     const response = await fetch(urlDatos);
@@ -287,6 +332,7 @@ async function cargarDatosWeatherLink(urlDatos, nombre){
   }catch(e){ console.error(e); return "<div class='popup-card'>Error al cargar WeatherLink</div>"; }
 }
 
+
 // ======= MAPA =======
 const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19 });
 const googleSat = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', { maxZoom: 20, attribution: '© Google' });
@@ -300,13 +346,12 @@ tituloControlBottom.addTo(map);
 let marcadores = [];
 
 async function mostrarEstaciones(lista){
-  // Eliminar marcadores antiguos
+  // Eliminar marcadores previos
   marcadores.forEach(m => map.removeLayer(m));
   marcadores = [];
 
   lista.forEach(est => {
-    // Color inicial
-    const colorMarcador = (est.tipo === "weatherlink") ? "blue" : "green";
+    const colorMarcador = (est.tipo === "italca") ? "purple" : (est.tipo === "weatherlink") ? "blue" : "green";
 
     const marker = L.circleMarker([est.lat, est.lng], {
       radius: 10,
@@ -316,10 +361,9 @@ async function mostrarEstaciones(lista){
       weight: 2
     }).addTo(map);
 
-    // Agregar al array de marcadores
     marcadores.push(marker);
 
-    // Cargar los datos en segundo plano y actualizar color si fuera de línea
+    // Verificar si está fuera de línea
     (async()=>{
       let ultimaFecha;
       try {
@@ -328,6 +372,8 @@ async function mostrarEstaciones(lista){
           const datos = await response.json();
           const ts = datos.ts || datos.time;
           if(ts) ultimaFecha = new Date(ts);
+        } else if(est.tipo === "italca") {
+          // No revisa fecha específica, se puede mejorar si la API da timestamp
         } else {
           const response = await fetch(est.urlDatos);
           const texto = await response.text();
@@ -362,18 +408,20 @@ async function mostrarEstaciones(lista){
     // bind popup
     marker.on('click', async ()=> {
       let contenido;
-      if(est.tipo==="weatherlink"){
+      if(est.tipo==="italca"){
+        contenido = await cargarDatosITALCA20(est.urlDatos, est.nombre);
+      } else if(est.tipo==="weatherlink"){
         contenido = await cargarDatosWeatherLink(est.urlDatos, est.nombre);
       } else {
         contenido = await cargarDatos(est.urlDatos, est.nombre);
       }
       marker.bindPopup(contenido).openPopup();
     });
+
   });
 }
 
-
-// ======= FILTRO CORREGIDO =======
+// ======= FILTRO =======
 document.getElementById("filtroEstaciones").addEventListener("change", function(){
   const valor = this.value.toLowerCase();
   let listaMostrar;
@@ -400,7 +448,7 @@ document.getElementById("filtroEstaciones").addEventListener("change", function(
   mostrarEstaciones(listaMostrar);
 });
 
-
+mostrarEstaciones(estaciones);
 
 mostrarEstaciones(estaciones);
 </script>
@@ -418,6 +466,10 @@ mostrarEstaciones(estaciones);
   z-index:1000;
 ">
 
+  <div style="display:flex;align-items:center;">
+    <span style="width:14px;height:14px;background:purple;border-radius:50%;display:inline-block;margin-right:6px;"></span>
+    <span>Estaciones Wunderground conectadas</span>
+  </div>
   <div style="display:flex;align-items:center;">
     <span style="width:14px;height:14px;background:green;border-radius:50%;display:inline-block;margin-right:6px;"></span>
     <span>Estaciones Cumulus conectadas</span>
@@ -437,3 +489,6 @@ mostrarEstaciones(estaciones);
 </body>
 </html>
 
+</script>
+</body>
+</html>
