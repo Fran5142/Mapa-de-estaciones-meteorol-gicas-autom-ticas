@@ -2,173 +2,438 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="EMA" content="width=device-width, initial-scale=1.0">
-<title> E.M.A</title>
-
-<!-- Fuente moderna -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
+<title>Mapa de Estaciones Meteorológicas</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 <style>
-/* ===== Body ===== */
-body {
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(160deg, #001a33, #002b55, #001a33);
-    color: #fff;
-    margin: 0;
-    padding: 0;
-    line-height: 1.6;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-
-/* ===== Menú ===== */
-nav {
-    background-color: rgba(0,31,63,0.5);
-    backdrop-filter: blur(8px);
-    padding: 12px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    box-shadow: 0 4px 20px rgba(0,255,255,0.2);
-    border-bottom: 1px solid #004080;
-}
-nav .logo img {
-    height: 110px;
-}
-nav .logo-right img {
-    height: 110px;
-}
-nav ul {
-    list-style: none;
-    display: flex;
-    margin: 0;
-    padding: 0;
-}
-nav ul li {
-    position: relative;
-    margin-left: 11px;
-}
-nav ul li a {
-    color: #c0e8ff;
-    text-decoration: none;
-    padding: 10px 15px;
-    display: block;
-    border-radius: 5px;
-    font-weight: 600;
+  body { margin:0; padding:0; }
+  #map { height: 100vh; }
+  .popup-card {
+    font-family: "Segoe UI", Roboto, sans-serif;
+    background: linear-gradient(145deg, #ffffff, #f0f4f8);
+    padding: 1.5em;
+    border-radius: 16px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+    width: 320px;
     transition: all 0.3s ease;
-}
-nav ul li a:hover {
-    background-color: #004080;
-    color: #d0e8ff;
-}
-
-/* ===== Cabecera ===== */
-header {
-    text-align: center;
-    padding: 50px 20px 20px 20px;
-}
-h1 {
-    font-size: 2.6rem;
-    font-weight: 700;
-    background: linear-gradient(90deg, #00f0ff, #00ffae, #00f0ff);
-    background-clip: text;
-    -webkit-background-clip: text;
-    color: transparent;
-    animation: gradient 5s ease infinite;
-}
-@keyframes gradient {
-    0%{background-position:0% 50%;}
-    50%{background-position:100% 50%;}
-    100%{background-position:0% 50%;}
-}
-
-/* ===== Mensaje No Disponible ===== */
-.not-available {
-    background: rgba(255, 68, 68, 0.1);
-    color: #ff7777;
-    border: 1px solid rgba(255, 68, 68, 0.4);
-    padding: 12px 20px;
-    margin: 10px auto 15px auto;
-    max-width: 600px;
-    text-align: center;
-    border-radius: 12px;
-    font-weight: 600;
-    font-size: 1.1rem;
-    box-shadow: 0 0 15px rgba(255, 68, 68, 0.3);
-}
-.not-available i {
-    margin-right: 8px;
-}
-
-/* ===== Mensaje Adicional ===== */
-.extra-message {
-    max-width: 600px;
-    margin: 0 auto 30px auto;
-    padding: 10px 20px;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 10px;
-    text-align: center;
-    font-size: 0.95rem;
-    color: #c0e8ff;
-}
-
-/* ===== Footer ===== */
-footer {
-    margin-top: auto;
-    background-color: rgba(0, 31, 63, 0.6);
-    padding: 15px;
-    text-align: center;
-    font-size: 0.9rem;
-    color: #c0e8ff;
-    border-top: 1px solid rgba(255,255,255,0.1);
-}
-footer span {
-    font-weight: 600;
-}
+    font-size: 1.05em;
+  }
+  .popup-card:hover { transform: scale(1.03); box-shadow: 0 8px 22px rgba(0,0,0,0.3); }
+  .popup-card .titulo { font-weight: bold; text-align: center; font-size: 1.3em; color: #1a3d6d; margin-bottom: 0.8em; text-shadow: 0 1px 2px rgba(0,0,0,0.15); }
+  .popup-card .label { font-weight: bold; color: #0077b6; display: inline-block; width: 140px; }
+  .popup-card .dato { margin: 0.5em 0; font-size: 1.05em; color: #222; padding: 6px 10px; border-radius: 8px; background: rgba(0,119,182,0.05); }
+  hr { border: none; height: 1px; background: #ddd; margin: 0.8em 0; }
+  .map-title-bottom h2 { font-family: sans-serif; font-size: 18px; color: rgba(255,255,255,0.9); margin: 0; padding: 6px 12px; background: rgba(0,0,0,0.3); border-radius: 6px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+  @media (max-width: 768px) {
+    .popup-card { width: 95%; padding: 2em; font-size: 1.4em; }
+    .popup-card .titulo { font-size: 1.8em; }
+    .popup-card .dato { font-size: 1.3em; padding: 10px 14px; }
+    .popup-card .label { width: 150px; }
+    .map-title-bottom h2 { font-size: 22px; }
+  }
 </style>
 </head>
 <body>
 
-<!-- Barra superior -->
-<nav>
-    <div class="logo">
-        <img src="https://archive.org/download/imagen_mejorada_3D/ppp.png" alt="Logo Izquierdo">
-    </div>
-    <ul>
-        <!-- Menú vacío sin Normas -->
-    </ul>
-    <div class="logo-right">
-        <img src="https://archive.org/download/imagen_mejorada_3D/LOGO%20METEOPMO.png" alt="Logo Derecho">
-    </div>
-</nav>
-
-<!-- Cabecera -->
-<header>
-    <h1>Mapa de Estaciones Meteorológicas</h1>
-</header>
-
-<!-- Mensaje No Disponible -->
-<div class="not-available">
-    <i class="fa-solid fa-circle-exclamation"></i> No disponible temporalmente
+<!-- Selector de estaciones -->
+<div style="position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:1000;background:white;padding:5px;border-radius:5px;">
+  <select id="filtroEstaciones">
+    <option value="todas">Todas las estaciones</option>
+    <option value="cuarzona">Cuarzona</option>
+    <option value="prizona">Prizona</option>
+    <option value="sezona">Sezona</option>
+    <option value="quinzona">Quinzona</option>
+    <option value="terzona">Terzona</option>
+  </select>
 </div>
 
-<!-- Mensajes Adicionales -->
-<div class="extra-message">
-    Estamos realizando trabajos de mantenimiento en el sistema de monitoreo.<br>
-    La visualización de datos estará habilitada nuevamente en las próximas horas.<br>
-    Agradecemos su comprensión.
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+// ======= LISTA COMPLETA DE ESTACIONES =======  
+const estaciones = [
+
+// ======= CUARZONA =======
+  { nombre: "Estación Capitanía de Puerto de Arica", lat: -18.47672398628623, lng: -70.32197533176908, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/arica/realtime.txt" },
+
+  { nombre: "Estación Alcaldía de mar Pisagua", lat: -19.35, lng: -70.12, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/pisagua/realtime.txt" },
+
+  { nombre: "Estación Gobernación Marítima de Iquique", lat: -20.1240, lng: -70.0912, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/iquique/realtime.txt" },
+
+  { nombre: "Estación Capitanía de Puerto de Patache", lat: -20.4758, lng: -70.1116, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/patache/realtime.txt" },
+
+  { nombre: "Estación Capitanía de Puerto de Tocopilla", lat: -22.0531, lng: -70.1152, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/tocopilla/realtime.txt" },
+
+  { nombre: "Estación Capitanía de Puerto de Mejillones", lat: -23.0551, lng: -70.2721, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/mejillones/realtime.txt" },
+
+  { nombre: "Estación Capitanía de Puerto de Taltal", lat: -25.2427, lng: -70.2928, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/taltal/realtime.txt" },
+
+// ======= PRIZONA =======
+
+
+  { nombre: "Estación Capitanía de Puerto de Chañaral", lat: -26.21, lng: -70.38, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/chanaral/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Caldera", lat: -27.07, lng: -71.23, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/Caldera/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Hanga Roa", lat: -27.09, lng: -109.26, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/pascua/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Huasco", lat: -28.27, lng: -71.13, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/huasco/realtime.txt" },
+  { nombre: "Estación Faro Punta Tortuga", lat: -29.56, lng: -71.20, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/tortuga/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto Los Vilos", lat: -31.54, lng: -71.30, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/losvilos/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Quintero", lat: -32.46, lng: -71.31, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/quintero/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Valparaiso", lat: -33.02, lng: -71.37, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/valparaiso/realtime.txt" },
+  { nombre: "Estación Faro Punta Panul", lat: -33.34, lng: -71.34, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/Panul/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Juan Fernandez", lat: -33.38, lng: -78.49, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/cumberland/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Pichilemu", lat: -34.23, lng: -72.00, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/Pichilemu/realtime.txt" },
+
+
+  { nombre: "Club de Yates Recreo (Viña del Mar)", lat: -45.49, lng: -80.98, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/0c66339eed4f47d4a9240ced0b66c982" },
+  { nombre: "WL Chilquinta Muelle Barón (Valparaíso)", lat: -45.49, lng: -81.98, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/6342b5802c8542f6a359487f335f3718" },
+  { nombre: "Dique Flotante Valparaíso III", lat: -45.49, lng: -82.98, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/1e4869cc59824e6893fc56b963304664" },
+  { nombre: "Cofradía Náutica del Pacífico (Algarrobo)", lat: -45.49, lng: -83.98, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/9fa531d050e648a9a8aa6bb7026c3902" },
+
+	
+// ======= TERZONA =======
+
+  { nombre: "Estación Capitanía de Puerto de Corral", lat: -39.887789132819336, lng: -73.42781070392009, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/corral/realtime.txt" },   
+  { nombre: "Estación Capitanía de Puerto de Carahue", lat: -38.788423273400966, lng: -73.39718655933679, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/carahue/realtime.txt" }, 
+  { nombre: "Estación Capitanía de Puerto de Lebu", lat: -37.604808697386304, lng: -73.6537885217902, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/lebu/realtime.txt" },   
+  { nombre: "Estación Capitanía de Puerto de Lota", lat: -37.09718322738166, lng: -73.15947726291334, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/lota/realtime.txt" }, 
+  { nombre: "Estación Capitanía de Puerto de Coronel", lat: -37.027302010958486, lng: -73.14885352186091, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/coronel/realtime.txt" },  
+  { nombre: "Estación Centro Meteorológico de Talcahuano", lat: -36.70798310695746, lng: -73.11343866909345, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/talcahuano/realtime.txt" },  
+  { nombre: "Estación Capitanía de Puerto de Lirquén", lat: -36.71136815014315, lng: -72.97771208216336, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/lirquen/realtime.txt" }, 
+  { nombre: "Estación Capitanía de Puerto de Constitución", lat: -35.32437344009416, lng: -72.4084436325508, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/constitucion/realtime.txt" },
+
+// ======= QUINZONA =======
+
+  { nombre: "Estación Quinzona - Isla Tenglo", lat: -41.486, lng: -72.951, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/quinzona/realtime.txt" },
+  { nombre: "Estación Alcaldía de mar Chacao", lat: -41.8294, lng: -73.5186, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/alcamarchacao/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Maullín", lat: -41.6156, lng: -73.5954, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/maullin/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Ancud", lat: -41.8662, lng: -73.8310, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/ancud/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Aguirre", lat: -45.1646, lng: -73.5217, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/aguirre/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Chacabuco", lat: -45.4652, lng: -72.8212, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/chacabuco/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Melinka", lat: -43.8965, lng: -73.7489, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/melinka/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Quemchi", lat: -42.1448, lng: -73.4731, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/Quemchi/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Chonchi", lat: -42.6186, lng: -73.7689, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/chonchi/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Chaitén", lat: -42.9147, lng: -72.7120, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/chaiten/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto de Quellón", lat: -43.1206, lng: -73.6216, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/quellon/realtime.txt" },
+
+
+  { nombre: "Club Náutico Reloncaví", lat: -41.4990, lng: -72.9881, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/2bc9e7ae099849478a8ce1e4c5128e6d" },
+  { nombre: "Alcaldía De Mar Tabón", lat: -41.91093767973031, lng: -73.13828997867896, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/a175266c2de040f2922b03e54316f734" },
+
+  { nombre: "Caleta La Arena", lat: -41.691549839025065, lng: -72.64180999361956, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/pcFPvOKrhY6669s5Bu4fo3bFnqTagixd" },
+
+  { nombre: "Caleta Puelche", lat: -41.73859367436766, lng: -72.64759326586844, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/pcFPvOKrhY6669s5Bu4fo3bFnqTagixd" },
+
+  { nombre: "Portuaria Cabo Froward", lat: -42.73859367436766, lng: -72.64759326586844, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/w9pY7INxB8Eu2TfFCXvI7kBlTOfP8tyD" },
+
+
+
+
+// ======= TERZONA =======
+
+  { nombre: "Estación Alcaldía de mar Timbales", lat: -54.5308, lng: -70.1300, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/timbales/realtime.txt" },
+  { nombre: "Estación Alcaldía de mar Navarino", lat: -54.5532, lng: -68.1926, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/navarino/realtime.txt" },
+  { nombre: "Estación Capitanía de Puerto Edén", lat: -49.0745, lng: -74.2545, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/eden/realtime.txt" },
+  { nombre: "Estación Alcaldía de mar corrientes", lat: -54.5919, lng: -68.2040, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/corrientes/realtime.txt" },
+
+  { nombre: "Muelle Capitán Guillermos Punta Arenas", lat: -55.4990, lng: -83.9881, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/aa24908f6c68472ba163e55765986705" },
+
+
+];
+
+// ======= GRUPOS =======
+const grupoCuarzona = [
+  // Agrega aquí tus estaciones de Cuarzona
+"Estación Capitanía de Puerto de Arica",
+"Estación Alcaldía de mar Pisagua",
+"Estación Gobernación Marítima de Iquique",
+"Estación Capitanía de Puerto de Patache",
+"Estación Capitanía de Puerto de Tocopilla",
+"Estación Capitanía de Puerto de Mejillones",
+"Estación Capitanía de Puerto de Taltal",
+
+
+];
+
+const grupoPrizona = [
+  // Agrega aquí tus estaciones de Prizona
+"Estación Capitanía de Puerto de Chañaral",
+"Estación Capitanía de Puerto de Caldera",
+"Estación Capitanía de Puerto de Hanga Roa",
+"Estación Capitanía de Puerto de Huasco",
+"Estación Faro Punta Tortuga",
+"Estación Capitanía de Puerto Los Vilos",
+"Estación Capitanía de Puerto de Quintero",
+"Estación Capitanía de Puerto de Valparaiso",
+"Estación Faro Punta Panul",
+"Estación Capitanía de Puerto de Juan Fernandez",
+"Estación Capitanía de Puerto de Pichilemu",
+
+"Club de Yates Recreo (Viña del Mar)",
+"WL Chilquinta Muelle Barón (Valparaíso)",
+"Dique Flotante Valparaíso III",
+"Cofradía Náutica del Pacífico (Algarrobo)",
+
+
+
+
+];
+
+const grupoSezona = [
+"Estación Capitanía de Puerto de Corral",
+"Estación Capitanía de Puerto de Carahue",
+"Estación Capitanía de Puerto de Lebu",
+"Estación Capitanía de Puerto de Lota",
+"Estación Capitanía de Puerto de Coronel",
+"Estación Centro Meteorológico de Talcahuano",
+"Estación Capitanía de Puerto de Lirquén",
+"Estación Capitanía de Puerto de Constitución",
+
+];
+
+const grupoQuinzona = [
+  "Estación Quinzona - Isla Tenglo",
+  "Club Náutico Reloncaví",
+  "Estación Capitanía de Puerto de Maullín",
+  "Estación Alcaldía de mar Chacao",
+  "Estación Capitanía de Puerto de Ancud",
+  "Estación Capitanía de Puerto de Quemchi",
+  "Estación Capitanía de Puerto de Chonchi",
+  "Estación Capitanía de Puerto de Chaitén",
+  "Estación Capitanía de Puerto de Quellón",
+  "Estación Capitanía de Puerto de Melinka",
+  "Estación Capitanía de Puerto de Aguirre",
+  "Estación Capitanía de Puerto de Chacabuco",
+
+
+   "Alcaldía De Mar Tabón",
+   "Caleta Puelche",
+   "Caleta La Arena",
+   "Portuaria Cabo Froward",
+
+  // Agrega más estaciones de Quinzona aquí si quieres
+];
+
+const grupoTerzona = [
+"Estación Alcaldía de mar Timbales",
+"Estación Alcaldía de mar Navarino",
+"Estación Capitanía de Puerto Edén",
+"Estación Alcaldía de mar corrientes",
+"Muelle Capitán Guillermos Punta Arenas",
+
+  // Agrega aquí tus estaciones de Terzona
+];
+
+// ======= FUNCIONES AUXILIARES =======
+function convertirGradosAPuntoCardinal(grados){
+  const direcciones = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+  return direcciones[Math.round(grados/22.5)%16];
+}
+
+async function cargarDatos(urlDatos, nombre){
+  try{
+    const response = await fetch(urlDatos);
+    const texto = await response.text();
+    const lineas = texto.trim().split('\n');
+    const ultimaLinea = lineas[lineas.length-1];
+    const datos = ultimaLinea.trim().split(/\s+/);
+    const fecha = datos[0] || "-";
+    const hora = datos[1] || "-";
+    const direccionGrados = parseFloat(datos[7]||0);
+    const intensidadNudos = datos[5]||0;
+    const direccionCardinal = convertirGradosAPuntoCardinal(direccionGrados);
+    return `
+      <div class="popup-card">
+        <div class="titulo">📡 ${nombre}</div>
+        <div class="dato" style="background:#e6f7ff;">📅 Última actualización: ${fecha} ${hora}</div>
+        <hr>
+        <div class="dato"><span class="label">🌡 Temperatura:</span> ${datos[2]||"-"} °C</div>
+        <div class="dato"><span class="label">💧 Humedad:</span> ${datos[3]||"-"} %</div>
+        <div class="dato"><span class="label">🌫 Punto de rocío:</span> ${datos[4]||"-"} °C</div>
+        <div class="dato"><span class="label">🧭 Presión:</span> ${datos[10]||"-"} hPa</div>
+        <div class="dato"><span class="label">🌬 Viento:</span> ${direccionGrados}° (${direccionCardinal}) ${intensidadNudos} nds</div>
+        <div class="dato"><span class="label">💨 Rachas:</span> ${datos[40]||"-"} nds</div>
+        <div class="dato"><span class="label">🌧️ Precipitación:</span> ${datos[9]||"-"} mm</div>
+      </div>`;
+  }catch(e){ console.error(e); return "<div class='popup-card'>Error al cargar los datos.</div>"; }
+}
+
+async function cargarDatosWeatherLink(urlDatos, nombre){
+  try{
+    const response = await fetch(urlDatos);
+    let datos = {};
+    try { datos = await response.json(); } catch(e){ datos={}; }
+    let ultimaAct;
+    if(datos.ts || datos.time){
+      const ts = new Date(datos.ts || datos.time);
+      ultimaAct = ts.toLocaleString("es-CL", {hour12:false});
+    } else {
+      ultimaAct = new Date().toLocaleString("es-CL", {hour12:false});
+    }
+    const dir = datos.windDirection || 0;
+    const spd = datos.wind || 0;
+    const racha = datos.gust || 0;
+    return `
+      <div class="popup-card">
+        <div class="titulo">🌐 ${nombre}</div>
+        <div class="dato" style="background:#e6f7ff;">📅 Última actualización: ${ultimaAct}</div>
+        <hr>
+        <div class="dato"><span class="label">🌡 Temperatura:</span> ${datos.temperature || "-"} °C</div>
+        <div class="dato"><span class="label">💧 Humedad:</span> ${datos.humidity || "-"} %</div>
+        <div class="dato"><span class="label">🧭 Presión:</span> ${datos.barometer || "-"} hPa</div>
+        <div class="dato"><span class="label">🌬 Viento:</span> ${dir}° (${convertirGradosAPuntoCardinal(dir)}) ${spd} nds</div>
+        <div class="dato"><span class="label">💨 Rachas:</span> ${racha} nds</div>
+        <div class="dato"><span class="label">🌧️ Precipitación:</span> ${datos.rain || "-"} mm</div>
+      </div>`;
+  }catch(e){ console.error(e); return "<div class='popup-card'>Error al cargar WeatherLink</div>"; }
+}
+
+// ======= MAPA =======
+const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19 });
+const googleSat = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', { maxZoom: 20, attribution: '© Google' });
+const map = L.map('map',{layers:[osm]}).setView([-41.5,-73],7);
+L.control.layers({"Mapa":osm,"Satélite Google":googleSat},null,{position:'topleft'}).addTo(map);
+
+const tituloControlBottom = L.control({position:'bottomleft'});
+tituloControlBottom.onAdd=function(map){ const div = L.DomUtil.create('div','map-title-bottom'); div.innerHTML='<h2>Estaciones Meteorológicas Automáticas</h2>'; return div; };
+tituloControlBottom.addTo(map);
+
+let marcadores = [];
+
+async function mostrarEstaciones(lista){
+  // Eliminar marcadores antiguos
+  marcadores.forEach(m => map.removeLayer(m));
+  marcadores = [];
+
+  lista.forEach(est => {
+    // Color inicial
+    const colorMarcador = (est.tipo === "weatherlink") ? "blue" : "green";
+
+    const marker = L.circleMarker([est.lat, est.lng], {
+      radius: 10,
+      color: colorMarcador,
+      fillColor: colorMarcador,
+      fillOpacity: 0.6,
+      weight: 2
+    }).addTo(map);
+
+    // Agregar al array de marcadores
+    marcadores.push(marker);
+
+    // Cargar los datos en segundo plano y actualizar color si fuera de línea
+    (async()=>{
+      let ultimaFecha;
+      try {
+        if(est.tipo === "weatherlink"){
+          const response = await fetch(est.urlDatos);
+          const datos = await response.json();
+          const ts = datos.ts || datos.time;
+          if(ts) ultimaFecha = new Date(ts);
+        } else {
+          const response = await fetch(est.urlDatos);
+          const texto = await response.text();
+          const lineas = texto.trim().split('\n');
+          const ultimaLinea = lineas[lineas.length-1];
+          const datos = ultimaLinea.trim().split(/\s+/);
+          const fecha = datos[0] || "-";
+          const hora = datos[1] || "-";
+          if(fecha !== "-" && hora !== "-"){
+            const partes = fecha.split("-");
+            const dia = parseInt(partes[0],10);
+            const mes = parseInt(partes[1],10)-1;
+            let anio = parseInt(partes[2],10);
+            if(anio<100) anio += 2000;
+            const partesHora = hora.split(":");
+            const horas = parseInt(partesHora[0],10);
+            const minutos = parseInt(partesHora[1],10);
+            const segundos = parseInt(partesHora[2],10);
+            ultimaFecha = new Date(anio, mes, dia, horas, minutos, segundos);
+          }
+        }
+      } catch(e){ console.error(e); }
+
+      if(ultimaFecha){
+        const diffMin = (new Date() - ultimaFecha)/1000/60;
+        if(diffMin>10){
+          marker.setStyle({color:"red", fillColor:"red"});
+        }
+      }
+    })();
+
+    // bind popup
+    marker.on('click', async ()=> {
+      let contenido;
+      if(est.tipo==="weatherlink"){
+        contenido = await cargarDatosWeatherLink(est.urlDatos, est.nombre);
+      } else {
+        contenido = await cargarDatos(est.urlDatos, est.nombre);
+      }
+      marker.bindPopup(contenido).openPopup();
+    });
+  });
+}
+
+
+// ======= FILTRO CORREGIDO =======
+document.getElementById("filtroEstaciones").addEventListener("change", function(){
+  const valor = this.value.toLowerCase();
+  let listaMostrar;
+
+  // Función que normaliza nombres: minúsculas y sin espacios extras
+  const normalizar = str => str.toLowerCase().trim();
+
+  if(valor === "todas"){
+    listaMostrar = estaciones;
+  } else if(valor === "cuarzona"){
+    listaMostrar = estaciones.filter(e => grupoCuarzona.some(g => normalizar(g) === normalizar(e.nombre)));
+  } else if(valor === "prizona"){
+    listaMostrar = estaciones.filter(e => grupoPrizona.some(g => normalizar(g) === normalizar(e.nombre)));
+  } else if(valor === "sezona"){
+    listaMostrar = estaciones.filter(e => grupoSezona.some(g => normalizar(g) === normalizar(e.nombre)));
+  } else if(valor === "quinzona"){
+    listaMostrar = estaciones.filter(e => grupoQuinzona.some(g => normalizar(g) === normalizar(e.nombre)));
+  } else if(valor === "terzona"){
+    listaMostrar = estaciones.filter(e => grupoTerzona.some(g => normalizar(g) === normalizar(e.nombre)));
+  } else {
+    listaMostrar = estaciones;
+  }
+
+  mostrarEstaciones(listaMostrar);
+});
+
+
+
+mostrarEstaciones(estaciones);
+</script>
+<!-- Leyenda -->
+<div id="leyenda" style="
+  position:absolute;
+  bottom:20px;
+  right:20px;
+  background:white;
+  padding:10px 14px;
+  border-radius:8px;
+  font-family:sans-serif;
+  font-size:14px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.3);
+  z-index:1000;
+">
+
+  <div style="display:flex;align-items:center;">
+    <span style="width:14px;height:14px;background:green;border-radius:50%;display:inline-block;margin-right:6px;"></span>
+    <span>Estaciones Cumulus conectadas</span>
+  </div>
+  <div style="display:flex;align-items:center;margin-bottom:4px;">
+    <span style="width:14px;height:14px;background:#1E90FF;border-radius:50%;display:inline-block;margin-right:6px;"></span>
+    <span>Estaciones WeatherLink Conectadas</span>
+  </div>
+  <div style="display:flex;align-items:center;margin-bottom:4px;">
+    <span style="width:14px;height:14px;background:#FF4500;border-radius:50%;display:inline-block;margin-right:6px;"></span>
+    <span>Fuera de linea</span>
+  </div>
+
 </div>
 
-<!-- Footer -->
-<footer>
-    &copy; 2025 Proyecto Web | Desarrollado por <span>Cabos 2º (Met.) Francisco Salas Muñoz</span>
-</footer>
 
 </body>
 </html>
+
