@@ -2,493 +2,450 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Mapa de Estaciones Meteorológicas</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title> E.M.A</title>
+
+<!-- Fuente moderna -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 <style>
-  body { margin:0; padding:0; }
-  #map { height: 100vh; }
-  .popup-card {
-    font-family: "Segoe UI", Roboto, sans-serif;
-    background: linear-gradient(145deg, #ffffff, #f0f4f8);
-    padding: 1.5em;
-    border-radius: 16px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
-    width: 320px;
+/* ===== Body ===== */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(160deg, #001a33, #002b55, #001a33);
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+/* ===== Menú ===== */
+nav {
+    background-color: rgba(0,31,63,0.5);
+    backdrop-filter: blur(8px);
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 4px 20px rgba(0,255,255,0.2);
+    border-bottom: 1px solid #004080;
+}
+nav .logo img {
+    height: 110px;
+}
+nav .logo-right img {
+    height: 110px;
+}
+nav ul {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+nav ul li {
+    position: relative;
+    margin-left: 11px;
+}
+nav ul li a {
+    color: #c0e8ff;
+    text-decoration: none;
+    padding: 10px 15px;
+    display: block;
+    border-radius: 5px;
+    font-weight: 600;
     transition: all 0.3s ease;
-    font-size: 1.05em;
-  }
-  .popup-card:hover { transform: scale(1.03); box-shadow: 0 8px 22px rgba(0,0,0,0.3); }
-  .popup-card .titulo { font-weight: bold; text-align: center; font-size: 1.3em; color: #1a3d6d; margin-bottom: 0.8em; text-shadow: 0 1px 2px rgba(0,0,0,0.15); }
-  .popup-card .label { font-weight: bold; color: #0077b6; display: inline-block; width: 140px; }
-  .popup-card .dato { margin: 0.5em 0; font-size: 1.05em; color: #222; padding: 6px 10px; border-radius: 8px; background: rgba(0,119,182,0.05); }
-  hr { border: none; height: 1px; background: #ddd; margin: 0.8em 0; }
-  .map-title-bottom h2 { font-family: sans-serif; font-size: 18px; color: rgba(255,255,255,0.9); margin: 0; padding: 6px 12px; background: rgba(0,0,0,0.3); border-radius: 6px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
-  @media (max-width: 768px) {
-    .popup-card { width: 95%; padding: 2em; font-size: 1.4em; }
-    .popup-card .titulo { font-size: 1.8em; }
-    .popup-card .dato { font-size: 1.3em; padding: 10px 14px; }
-    .popup-card .label { width: 150px; }
-    .map-title-bottom h2 { font-size: 22px; }
-  }
+}
+nav ul li a:hover {
+    background-color: #004080;
+    color: #d0e8ff;
+}
+
+/* Submenú */
+nav ul li ul {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: rgba(0,34,68,0.8);
+    min-width: 180px;
+    border-radius: 5px;
+    padding: 0;
+    z-index: 1000;
+}
+nav ul li:hover > ul {
+    display: block;
+}
+nav ul li ul li ul {
+    left: 100%;
+    top: 0;
+}
+nav ul li ul li:hover > ul {
+    display: block;
+}
+
+/* ===== Cabecera ===== */
+header {
+    text-align: center;
+    padding: 50px 20px;
+}
+h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, #00f0ff, #00ffae, #00f0ff);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    animation: gradient 5s ease infinite;
+}
+@keyframes gradient {
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+}
+
+/* ===== Hora ===== */
+.time-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 50px;
+    margin: 20px 0;
+    font-size: 1.3rem;
+    font-weight: 500;
+    background: rgba(0,34,68,0.4);
+    padding: 15px 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+.time-container i {
+    color: #00f0ff;
+    margin-right: 8px;
+}
+
+/* Slideshow */
+.slideshow-container {
+  width: 90%;
+  max-width: 800px;
+  height: 450px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.5);
+  margin: 30px auto;
+}
+.slide {
+    opacity: 0;
+    position: absolute;
+    width: 100%;
+    transition: opacity 1s ease-in-out;
+}
+.slide.active {
+    opacity: 1;
+    position: relative;
+}
+.slide img {
+    width: 100%;
+    border-radius: 15px;
+    filter: brightness(0.9);
+    transition: transform 0.8s ease;
+}
+.slide.active img {
+    transform: scale(1.02);
+}
+
+/* ===== Botones ===== */
+section {
+    text-align: center;
+    margin: 40px 0;
+}
+a.btn {
+    display: inline-block;
+    margin: 10px;
+    padding: 14px 28px;
+    background: rgba(0,240,255,0.2);
+    color: #00f0ff;
+    border-radius: 12px;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+a.btn:hover {
+    background: rgba(0,240,255,0.6);
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 10px 25px rgba(0,255,255,0.5);
+}
+
+/* ===== Footer ===== */
+footer {
+    margin-top: 80px;
+    padding: 20px;
+    font-size: 0.9rem;
+    background: rgba(255,255,255,0.05);
+    border-top: 1px solid rgba(255,255,255,0.2);
+    text-align: center;
+    color: #00f0ff;
+    position: relative;
+    z-index: 100;
+}
+
+/* ===== Modal ===== */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.8);
+}
+.modal-content {
+    background-color: #001f3f;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 700px;
+    text-align: center;
+    color: #c0e8ff;
+    animation: modalAppear 0.5s ease;
+}
+@keyframes modalAppear {
+    from {transform: translateY(-50px); opacity: 0;}
+    to {transform: translateY(0); opacity: 1;}
+}
+.modal-content img {
+    max-width: 100%;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+.close-modal {
+    color: #00f0ff;
+    float: right;
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+.close-modal:hover {
+    color: #00ffae;
+}
+
+/* ===== Botón flotante ===== */
+.floating-btn {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background-color: transparent;
+    padding: 0;
+    border-radius: 0;
+    z-index: 3000;
+    transition: transform 0.3s ease;
+}
+.floating-btn img {
+    width: 80px;
+    height: 100px;
+    display: block;
+}
+.floating-btn:hover {
+    transform: scale(1.2);
+}
 </style>
 </head>
 <body>
 
-<!-- Selector de estaciones -->
-<div style="position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:1000;background:white;padding:5px;border-radius:5px;">
-  <select id="filtroEstaciones">
-    <option value="todas">Todas las estaciones</option>
-    <option value="cuarzona">Cuarzona</option>
-    <option value="prizona">Prizona</option>
-    <option value="sezona">Sezona</option>
-    <option value="quinzona">Quinzona</option>
-    <option value="terzona">Terzona</option>
-  </select>
+<!-- Barra superior con menú y submenú -->
+<nav>
+    <div class="logo">
+        <img src="https://archive.org/download/imagen_mejorada_3D/ppp.png" alt="Logo Izquierdo">
+    </div>
+
+    <ul>
+        <li><a href="https://f" target="_blank">Normas</a></li>
+        <li>
+            <a href="#" id="openDavisModal">Davis Vantage Pro 2 <i class="fa-solid fa-chevron-down"></i></a>
+            <ul>
+                <li>
+                    <a href="#">Manuales <i class="fa-solid fa-chevron-right"></i></a>
+                    <ul>
+                        <li><a href="https://archive.org/download/manual-iss-davis-pro-2/Manual%20Consola%20Davis%20Pro%202%20inal%C3%A1mbrica.pdf">Consola Davis Pro2</a></li>
+                        <li><a href="https://archive.org/download/manual-iss-davis-pro-2/Manual%20ISS%20Davis%20Pro%202.pdf">ISS Davis Pro2</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#">App y Software <i class="fa-solid fa-chevron-right"></i></a>
+                    <ul>
+                        <li><a href="https://archive.org/download/estacionsalas/Cumulus_1_9_4.7z">Cumulus 1.9.4</a></li>
+                        <li><a href="https://archive.org/download/estacionsalas/WL6.0.5FULL.exe.7z">WeatherLink 6.0.5</a></li>
+                        <li><a href="https://archive.org/download/estacionsalas/CP210x_Universal_Windows_Driver.zip">Windows 10 Driver</a></li>
+                        <li><a href="https://archive.org/download/estacionsalas/dotNetFx35setup.7z">Microsoft NET 3.5</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">Otros</a></li>
+            </ul>
+        </li>
+
+        <li>
+            <a href="#" id="openYoungModal">Young Marine <i class="fa-solid fa-chevron-right"></i></a>
+            <ul>
+                <li>
+                    <a href="#">Manuales <i class="fa-solid fa-chevron-down"></i></a>
+                    <ul>
+                        <li>
+                            <a href="#">Anemómetro <i class="fa-solid fa-chevron-right"></i></a>
+                            <ul>
+                                <li><a href="https://archive.org/download/06201-90-k/05103-90.pdf">05103</a></li>
+                                <li><a href="https://archive.org/download/06201-90-k/05106-90.pdf">05106</a></li>
+                                <li><a href="https://archive.org/download/06201-90-k/86106-90.pdf">86106</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#">Display <i class="fa-solid fa-chevron-right"></i></a>
+                            <ul>
+                                <li><a href="https://archive.org/download/06201-90-k/06201-90%28K%29.pdf">06201</a></li>
+                                <li><a href="https://archive.org/download/06201-90-k/06206_man.pdf">06206</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#">Banco de Prueba <i class="fa-solid fa-chevron-right"></i></a>
+                            <ul>
+                                <li><a href="https://archive.org/download/06201-90-k/Manual%20Banco%20de%20Prueba%20Anem%C3%B3metro%20Young.pdf">Banco de Prueba</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+
+        <li>
+            <a href="#">Calibración <i class="fa-solid fa-chevron-down"></i></a>
+            <ul>
+                <li>
+                    <a href="#">Certificados <i class="fa-solid fa-chevron-right"></i></a>
+                    <ul>
+                        <li><a href="https://archive.org/download/certificado-calibracion_202507/CERTIFICADO%20CALIBRACION%20TEMPERATURA.xls">Temperatura</a></li>
+                        <li><a href="https://archive.org/download/certificado-calibracion_202507/CERTIFICADO%20CALIBRACION%20VIENTO.xls">Viento</a></li>
+                        <li><a href="https://archive.org/download/certificado-calibracion_202507/CERTIFICADO%20CALIBRACION%20PRESION.xls">Presión</a></li>
+                        <li><a href="https://archive.org/download/certificado-calibracion_202507/CERTIFICADO%20CALIBRACION.xls">Certificado</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">Normas</a></li>
+            </ul>
+        </li>
+
+        <li><a href="https://fran5142.github.io/Mapa-de-estaciones-meteorol-gicas-autom-ticas/">Mapa de Estaciones</a></li>
+    </ul>
+
+    <div class="logo-right">
+        <img src="https://archive.org/download/imagen_mejorada_3D/LOGO%20METEOPMO.png" alt="Logo Derecho">
+    </div>
+</nav>
+
+<!-- Cabecera -->
+<header>
+    <h1>Estación Meteorológica Automática</h1>
+</header>
+
+<!-- Hora -->
+<div class="time-container">
+    <div><i class="fa-solid fa-clock"></i> Hora Local: <span id="horaLocal"></span></div>
+    <div><i class="fa-solid fa-globe"></i> Hora UTC: <span id="horaUTC"></span></div>
 </div>
 
-<div id="map"></div>
+<!-- Slideshow -->
+<div class="slideshow-container">
+    <div class="slide active"><img src="https://archive.org/download/whats-app-image-2025-09-04-at-22.20.52/WhatsApp%20Image%202025-09-04%20at%2022.20.50.jpeg" alt="Estación Foto 1"></div>
+    <div class="slide"><img src="https://archive.org/download/whats-app-image-2025-09-04-at-22.20.52/WhatsApp%20Image%202025-09-04%20at%2022.20.48%20%281%29.jpeg" alt="Estación Foto 2"></div>
+    <div class="slide"><img src="https://archive.org/download/whats-app-image-2025-09-04-at-22.20.52/WhatsApp%20Image%202025-09-04%20at%2022.20.49%20%281%29.jpeg" alt="Estación Foto 3"></div>
+    <div class="slide"><img src="https://archive.org/download/whats-app-image-2025-09-04-at-22.20.52/WhatsApp%20Image%202025-09-04%20at%2022.20.52%20%281%29.jpeg" alt="Estación Foto 4"></div>
+    <div class="slide"><img src="https://archive.org/download/whats-app-image-2025-09-04-at-22.20.52/WhatsApp%20Image%202025-09-04%20at%2022.20.52.jpeg" alt="Estación Foto 5"></div>
+    <div class="slide"><img src="https://archive.org/download/whats-app-image-2025-09-04-at-22.20.52/WhatsApp%20Image%202025-09-04%20at%2022.20.53%20%282%29.jpeg" alt="Estación Foto 6"></div>
+</div>
 
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<!-- Modal Davis Vantage Pro2 -->
+<div id="davisModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" id="closeDavisModal">&times;</span>
+        <h2>Estación Meteorológica Davis Vantage Pro2</h2>
+        <img src="https://www.solargas.cl/wp-content/uploads/2018/11/T2eC16VygE9s7HI7vRBRohyO0w60_12.webp" alt="Davis Pro 2">
+        <p>
+            Características del equipo: Sensor de temperatura, humedad, presión y velocidad de viento. Ideal para estaciones meteorológicas automáticas con conectividad avanzada y registro de datos en tiempo real.
+        </p>
+    </div>
+</div>
+
+<!-- Modal Young Marine -->
+<div id="youngModal" class="modal">
+    <div class="modal-content">
+        <span id="closeYoungModal" class="close-modal">&times;</span>
+        <h2>Young Marine</h2>
+        <img src="https://www.youngusa.com/wp-content/uploads/2008/01/05106-600x600.jpg" alt="Young Marine" style="max-width: 100%; height: auto; border-radius: 10px;">
+        <p>
+            El monitor de viento es un sensor de viento de alto rendimiento. 
+	    Su construcción robusta y resistente a la corrosión lo hace ideal para una amplia gama de aplicaciones de medición del viento.
+        </p>
+    </div>
+</div>
+
+<!-- Botón flotante -->
+<a href="https://meteoarmada.directemar.cl/prontus_meteo/site/edic/base/port/inicio.html" target="_blank" class="floating-btn">
+    <img src="https://archive.org/download/logo-servimet-transparente/LOGO_SERVIMET_TRANSPARENTE.png" alt="Icono Servimet">
+</a>
+
+<!-- Pie -->
+<footer>
+  Creado por Cabo 2º (Met.) Francisco Salas Muñoz - 26/08/2025 
+</footer>
+
 <script>
-
-// ======= LISTA COMPLETA DE ESTACIONES =======  
-const estaciones = [
-
-// ======= CUARZONA =======
-  { nombre: "Estación Capitanía de Puerto de Arica", lat: -18.47672398628623, lng: -70.32197533176908, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/arica/realtime.txt" },
-
-  { nombre: "Estación Alcaldía de mar Pisagua", lat: -19.35, lng: -70.12, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/pisagua/realtime.txt" },
-
-  { nombre: "Estación Gobernación Marítima de Iquique", lat: -20.1240, lng: -70.0912, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/iquique/realtime.txt" },
-
-  { nombre: "Estación Capitanía de Puerto de Patache", lat: -20.4758, lng: -70.1116, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/patache/realtime.txt" },
-
-  { nombre: "Estación Capitanía de Puerto de Tocopilla", lat: -22.0531, lng: -70.1152, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/tocopilla/realtime.txt" },
-
-  { nombre: "Estación Capitanía de Puerto de Mejillones", lat: -23.0551, lng: -70.2721, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/mejillones/realtime.txt" },
-
-  { nombre: "Estación Capitanía de Puerto de Taltal", lat: -25.2427, lng: -70.2928, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/taltal/realtime.txt" },
-
-// ======= PRIZONA =======
-
-
-  { nombre: "Estación Capitanía de Puerto de Chañaral", lat: -26.21, lng: -70.38, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/chanaral/realtime.txt" },
-  { nombre: "Estación Capitanía de Puerto de Caldera", lat: -27.07, lng: -71.23, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/Caldera/realtime.txt" },
-  { nombre: "Estación Capitanía de Puerto de Hanga Roa", lat: -27.09, lng: -109.26, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/pascua/realtime.txt" },
-  { nombre: "Estación Capitanía de Puerto de Huasco", lat: -28.27, lng: -71.13, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/huasco/realtime.txt" },
-  { nombre: "Estación Faro Punta Tortuga", lat: -29.56, lng: -71.20, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/tortuga/realtime.txt" },
-  { nombre: "Estación Capitanía de Puerto Los Vilos", lat: -31.54, lng: -71.30, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/losvilos/realtime.txt" },
-  { nombre: "Estación Capitanía de Puerto de Quintero", lat: -32.46, lng: -71.31, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/quintero/realtime.txt" },
-  { nombre: "Estación Capitanía de Puerto de Valparaiso", lat: -33.02, lng: -71.37, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/valparaiso/realtime.txt" },
-  { nombre: "Estación Faro Punta Panul", lat: -33.34, lng: -71.34, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/Panul/realtime.txt" },
-  { nombre: "Estación Capitanía de Puerto de Juan Fernandez", lat: -33.38, lng: -78.49, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/cumberland/realtime.txt" },
-  { nombre: "Estación Capitanía de Puerto de Pichilemu", lat: -34.23, lng: -72.00, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/Pichilemu/realtime.txt" },
-
-
-  { nombre: "Club de Yates Recreo (Viña del Mar)", lat: -45.49, lng: -80.98, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/0c66339eed4f47d4a9240ced0b66c982" },
-  { nombre: "WL Chilquinta Muelle Barón (Valparaíso)", lat: -45.49, lng: -81.98, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/6342b5802c8542f6a359487f335f3718" },
-  { nombre: "Dique Flotante Valparaíso III", lat: -45.49, lng: -82.98, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/1e4869cc59824e6893fc56b963304664" },
-  { nombre: "Cofradía Náutica del Pacífico (Algarrobo)", lat: -45.49, lng: -83.98, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/9fa531d050e648a9a8aa6bb7026c3902" },
-
-	
-// ======= SEZONA =======
-
-  { nombre: "Estación Capitanía de Puerto de Corral", lat: -39.887789132819336, lng: -73.42781070392009, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/corral/realtime.txt" },   
-  { nombre: "Estación Capitanía de Puerto de Carahue", lat: -38.788423273400966, lng: -73.39718655933679, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/carahue/realtime.txt" }, 
-  { nombre: "Estación Capitanía de Puerto de Lebu", lat: -37.604808697386304, lng: -73.6537885217902, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/lebu/realtime.txt" },   
-  { nombre: "Estación Capitanía de Puerto de Lota", lat: -37.09718322738166, lng: -73.15947726291334, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/lota/realtime.txt" }, 
-  { nombre: "Estación Capitanía de Puerto de Coronel", lat: -37.027302010958486, lng: -73.14885352186091, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/coronel/realtime.txt" },  
-  { nombre: "Estación Centro Meteorológico de Talcahuano", lat: -36.70798310695746, lng: -73.11343866909345, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/talcahuano/realtime.txt" },  
-  { nombre: "Estación Capitanía de Puerto de Lirquén", lat: -36.71136815014315, lng: -72.97771208216336, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/lirquen/realtime.txt" }, 
-  { nombre: "Estación Capitanía de Puerto de Constitución", lat: -35.32437344009416, lng: -72.4084436325508, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/constitucion/realtime.txt" },
-
-
-  { nombre: "Estación Faro Isla Quiriquina", lat: -36.611578766421566, lng: -73.05240787211854, tipo: "italca", urlDatos: "https://api.weather.com/v2/pws/observations/current?apiKey=e1f10a1e78da46f5b10a1e78da96f525&stationId=ITALCA20&numericPrecision=decimal&format=json&units=e" },
-
-
-// ======= QUINZONA =======
-
-  { nombre: "Estación Quinzona - Isla Tenglo", lat: -41.48661084352241, lng: -72.9512652000025, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/quinzona/realtime.txt" },  
-  { nombre: "Estación Alcaldía de mar Chacao", lat: -41.8294, lng: -73.5186, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/alcamarchacao/realtime.txt" },
-  { nombre: "Estación Capitanía de Puerto de Maullín", lat: -41.6156, lng: -73.5954, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/maullin/realtime.txt" },
-  { nombre: "Estación Capitanía de Puerto de Ancud", lat: -41.8662, lng: -73.8310, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/ancud/realtime.txt" },
-  { nombre: "Estación Capitanía de Puerto de Aguirre", lat: -45.1646, lng: -73.5217, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/aguirre/realtime.txt" },
-  { nombre: "Estación Capitanía de Puerto de Chacabuco", lat: -45.4652, lng: -72.8212, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/chacabuco/realtime.txt" },
-  { nombre: "Estación Capitanía de Puerto de Melinka", lat: -43.8965, lng: -73.7489, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/melinka/realtime.txt" },
-  { nombre: "Estación Capitanía de Puerto de Quemchi", lat: -42.1448, lng: -73.4731, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/Quemchi/realtime.txt" },
-  { nombre: "Estación Capitanía de Puerto de Chonchi", lat: -42.6186, lng: -73.7689, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/chonchi/realtime.txt" },
-  { nombre: "Estación Capitanía de Puerto de Chaitén", lat: -42.9147, lng: -72.7120, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/chaiten/realtime.txt" },
-  { nombre: "Estación Capitanía de Puerto de Quellón", lat: -43.1206, lng: -73.6216, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/quellon/realtime.txt" },
-
-
-  { nombre: "Club Náutico Reloncaví", lat: -41.4990, lng: -72.9881, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/2bc9e7ae099849478a8ce1e4c5128e6d" },
-  { nombre: "Alcaldía De Mar Tabón", lat: -41.91093767973031, lng: -73.13828997867896, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/a175266c2de040f2922b03e54316f734" },
-
-  { nombre: "Caleta La Arena", lat: -41.691549839025065, lng: -72.64180999361956, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/pcFPvOKrhY6669s5Bu4fo3bFnqTagixd" },
-
-  { nombre: "Caleta Puelche", lat: -41.73859367436766, lng: -72.64759326586844, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/pcFPvOKrhY6669s5Bu4fo3bFnqTagixd" },
-
-  { nombre: "Portuaria Cabo Froward", lat: -42.73859367436766, lng: -72.64759326586844, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/w9pY7INxB8Eu2TfFCXvI7kBlTOfP8tyD" },
-
-
-
-
-// ======= TERZONA =======
-
-  { nombre: "Estación Alcaldía de mar Timbales", lat: -54.5308, lng: -70.1300, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/timbales/realtime.txt" },
-  { nombre: "Estación Alcaldía de mar Navarino", lat: -54.5532, lng: -68.1926, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/navarino/realtime.txt" },
-  { nombre: "Estación Capitanía de Puerto Edén", lat: -49.0745, lng: -74.2545, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/eden/realtime.txt" },
-  { nombre: "Estación Alcaldía de mar corrientes", lat: -54.5919, lng: -68.2040, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/corrientes/realtime.txt" },
-
-  { nombre: "Muelle Capitán Guillermos Punta Arenas", lat: -55.4990, lng: -83.9881, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/aa24908f6c68472ba163e55765986705" }, 
-
-
-];
-
-// ======= GRUPOS =======
-const grupoCuarzona = [
-  // Agrega aquí tus estaciones de Cuarzona
-"Estación Capitanía de Puerto de Arica",
-"Estación Alcaldía de mar Pisagua",
-"Estación Gobernación Marítima de Iquique",
-"Estación Capitanía de Puerto de Patache",
-"Estación Capitanía de Puerto de Tocopilla",
-"Estación Capitanía de Puerto de Mejillones",
-"Estación Capitanía de Puerto de Taltal",
-
-
-];
-
-const grupoPrizona = [
-  // Agrega aquí tus estaciones de Prizona
-"Estación Capitanía de Puerto de Chañaral",
-"Estación Capitanía de Puerto de Caldera",
-"Estación Capitanía de Puerto de Hanga Roa",
-"Estación Capitanía de Puerto de Huasco",
-"Estación Faro Punta Tortuga",
-"Estación Capitanía de Puerto Los Vilos",
-"Estación Capitanía de Puerto de Quintero",
-"Estación Capitanía de Puerto de Valparaiso",
-"Estación Faro Punta Panul",
-"Estación Capitanía de Puerto de Juan Fernandez",
-"Estación Capitanía de Puerto de Pichilemu",
-
-"Club de Yates Recreo (Viña del Mar)",
-"WL Chilquinta Muelle Barón (Valparaíso)",
-"Dique Flotante Valparaíso III",
-"Cofradía Náutica del Pacífico (Algarrobo)",
-
-
-
-
-];
-
-const grupoSezona = [
-"Estación Capitanía de Puerto de Corral",
-"Estación Capitanía de Puerto de Carahue",
-"Estación Capitanía de Puerto de Lebu",
-"Estación Capitanía de Puerto de Lota",
-"Estación Capitanía de Puerto de Coronel",
-"Estación Centro Meteorológico de Talcahuano",
-"Estación Capitanía de Puerto de Lirquén",
-"Estación Capitanía de Puerto de Constitución",
-"Estación Faro Isla Quiriquina",
-
-];
-
-const grupoQuinzona = [
-  "Estación Quinzona - Isla Tenglo",
-  "Club Náutico Reloncaví",
-  "Estación Capitanía de Puerto de Maullín",
-  "Estación Alcaldía de mar Chacao",
-  "Estación Capitanía de Puerto de Ancud",
-  "Estación Capitanía de Puerto de Quemchi",
-  "Estación Capitanía de Puerto de Chonchi",
-  "Estación Capitanía de Puerto de Chaitén",
-  "Estación Capitanía de Puerto de Quellón",
-  "Estación Capitanía de Puerto de Melinka",
-  "Estación Capitanía de Puerto de Aguirre",
-  "Estación Capitanía de Puerto de Chacabuco",
-
-
-   "Alcaldía De Mar Tabón",
-   "Caleta Puelche",
-   "Caleta La Arena",
-   "Portuaria Cabo Froward",
-
-  // Agrega más estaciones de Quinzona aquí si quieres
-];
-
-const grupoTerzona = [
-"Estación Alcaldía de mar Timbales",
-"Estación Alcaldía de mar Navarino",
-"Estación Capitanía de Puerto Edén",
-"Estación Alcaldía de mar corrientes",
-"Muelle Capitán Guillermos Punta Arenas",
-
-  // Agrega aquí tus estaciones de Terzona
-];
-
-
-// ======= FUNCIONES AUXILIARES =======
-function convertirGradosAPuntoCardinal(grados){
-  const direcciones = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
-  return direcciones[Math.round(grados/22.5)%16];
+// Actualización de la hora
+function updateTime() {
+    const now = new Date();
+    document.getElementById("horaLocal").textContent = now.toLocaleTimeString();
+    document.getElementById("horaUTC").textContent = now.toUTCString().split(" ")[4];
 }
+setInterval(updateTime, 1000);
+updateTime();
 
-// Función especial para ITALCA20
-async function cargarDatosITALCA20(urlDatos, nombre){
-  try{
-    const proxyUrl = 'https://corsproxy.io/?url=' + encodeURIComponent(urlDatos);
-    const response = await fetch(proxyUrl);
-    const data = await response.json();
-    const obs = data.observations[0];
-    const fechaObj = new Date(obs.obsTimeLocal);
-    const dia = String(fechaObj.getDate()).padStart(2,'0');
-    const mes = String(fechaObj.getMonth()+1).padStart(2,'0');
-    const año = fechaObj.getFullYear();
-    const hora = String(fechaObj.getHours()).padStart(2,'0') + ':' + String(fechaObj.getMinutes()).padStart(2,'0');
-    const direccionGrados = obs.winddir || 0;
-    const direccionCardinal = convertirGradosAPuntoCardinal(direccionGrados);
-    const velocidadNudos = (obs.imperial.windSpeed*0.868976).toFixed(1);
-    const rachasNudos = (obs.imperial.windGust*0.868976).toFixed(1);
-    const temperaturaC = ((obs.imperial.temp-32)*5/9).toFixed(1);
-    const puntoRocioC = ((obs.imperial.dewpt-32)*5/9).toFixed(1);
-    const presionhPa = (obs.imperial.pressure*33.8639).toFixed(1);
-    const humedad = obs.humidity;
-
-    return `
-      <div class="popup-card">
-        <div class="titulo">📡 ${nombre}</div>
-        <div class="dato" style="background:#e6f7ff;">📅 Última actualización: ${dia}/${mes}/${año} ${hora}</div>
-        <hr>
-        <div class="dato"><span class="label">🌡 Temperatura:</span> ${temperaturaC} °C</div>
-        <div class="dato"><span class="label">💧 Humedad:</span> ${humedad} %</div>
-        <div class="dato"><span class="label">🌫 Punto de rocío:</span> ${puntoRocioC} °C</div>
-        <div class="dato"><span class="label">🧭 Presión:</span> ${presionhPa} hPa</div>
-        <div class="dato"><span class="label">🌬 Viento:</span> ${direccionGrados}° (${direccionCardinal}) ${velocidadNudos} nds</div>
-        <div class="dato"><span class="label">💨 Rachas:</span> ${rachasNudos} nds</div>
-      </div>`;
-  }catch(e){ console.error(e); return "<div class='popup-card'>Error al cargar datos ITALCA20</div>"; }
-}
-
-// FUNCION CUMULUS
-async function cargarDatos(urlDatos, nombre){
-  try{
-    const response = await fetch(urlDatos);
-    const texto = await response.text();
-    const lineas = texto.trim().split('\n');
-    const ultimaLinea = lineas[lineas.length-1];
-    const datos = ultimaLinea.trim().split(/\s+/);
-    const fecha = datos[0] || "-";
-    const hora = datos[1] || "-";
-    const direccionGrados = parseFloat(datos[7]||0);
-    const intensidadNudos = datos[5]||0;
-    const direccionCardinal = convertirGradosAPuntoCardinal(direccionGrados);
-    return `
-      <div class="popup-card">
-        <div class="titulo">📡 ${nombre}</div>
-        <div class="dato" style="background:#e6f7ff;">📅 Última actualización: ${fecha} ${hora}</div>
-        <hr>
-        <div class="dato"><span class="label">🌡 Temperatura:</span> ${datos[2]||"-"} °C</div>
-        <div class="dato"><span class="label">💧 Humedad:</span> ${datos[3]||"-"} %</div>
-        <div class="dato"><span class="label">🌫 Punto de rocío:</span> ${datos[4]||"-"} °C</div>
-        <div class="dato"><span class="label">🧭 Presión:</span> ${datos[10]||"-"} hPa</div>
-        <div class="dato"><span class="label">🌬 Viento:</span> ${direccionGrados}° (${direccionCardinal}) ${intensidadNudos} nds</div>
-        <div class="dato"><span class="label">💨 Rachas:</span> ${datos[40]||"-"} nds</div>
-        <div class="dato"><span class="label">🌧️ Precipitación:</span> ${datos[9]||"-"} mm</div>
-      </div>`;
-  }catch(e){ console.error(e); return "<div class='popup-card'>Error al cargar los datos.</div>"; }
-}
-
-//FUNCION WEATHERLINK
-async function cargarDatosWeatherLink(urlDatos, nombre){
-  try{
-    const response = await fetch(urlDatos);
-    let datos = {};
-    try { datos = await response.json(); } catch(e){ datos={}; }
-    let ultimaAct;
-    if(datos.ts || datos.time){
-      const ts = new Date(datos.ts || datos.time);
-      ultimaAct = ts.toLocaleString("es-CL", {hour12:false});
-    } else {
-      ultimaAct = new Date().toLocaleString("es-CL", {hour12:false});
-    }
-    const dir = datos.windDirection || 0;
-    const spd = datos.wind || 0;
-    const racha = datos.gust || 0;
-    return `
-      <div class="popup-card">
-        <div class="titulo">🌐 ${nombre}</div>
-        <div class="dato" style="background:#e6f7ff;">📅 Última actualización: ${ultimaAct}</div>
-        <hr>
-        <div class="dato"><span class="label">🌡 Temperatura:</span> ${datos.temperature || "-"} °C</div>
-        <div class="dato"><span class="label">💧 Humedad:</span> ${datos.humidity || "-"} %</div>
-        <div class="dato"><span class="label">🧭 Presión:</span> ${datos.barometer || "-"} hPa</div>
-        <div class="dato"><span class="label">🌬 Viento:</span> ${dir}° (${convertirGradosAPuntoCardinal(dir)}) ${spd} nds</div>
-        <div class="dato"><span class="label">💨 Rachas:</span> ${racha} nds</div>
-        <div class="dato"><span class="label">🌧️ Precipitación:</span> ${datos.rain || "-"} mm</div>
-      </div>`;
-  }catch(e){ console.error(e); return "<div class='popup-card'>Error al cargar WeatherLink</div>"; }
-}
-
-
-// ======= MAPA =======
-const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19 });
-const googleSat = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', { maxZoom: 20, attribution: '© Google' });
-const map = L.map('map',{layers:[osm]}).setView([-41.5,-73],7);
-L.control.layers({"Mapa":osm,"Satélite Google":googleSat},null,{position:'topleft'}).addTo(map);
-
-const tituloControlBottom = L.control({position:'bottomleft'});
-tituloControlBottom.onAdd=function(map){ const div = L.DomUtil.create('div','map-title-bottom'); div.innerHTML='<h2>Estaciones Meteorológicas Automáticas</h2>'; return div; };
-tituloControlBottom.addTo(map);
-
-let marcadores = [];
-
-async function mostrarEstaciones(lista){
-  // Eliminar marcadores previos
-  marcadores.forEach(m => map.removeLayer(m));
-  marcadores = [];
-
-  lista.forEach(est => {
-    const colorMarcador = (est.tipo === "italca") ? "purple" : (est.tipo === "weatherlink") ? "blue" : "green";
-
-    const marker = L.circleMarker([est.lat, est.lng], {
-      radius: 10,
-      color: colorMarcador,
-      fillColor: colorMarcador,
-      fillOpacity: 0.6,
-      weight: 2
-    }).addTo(map);
-
-    marcadores.push(marker);
-
-    // Verificar si está fuera de línea
-    (async()=>{
-      let ultimaFecha;
-      try {
-        if(est.tipo === "weatherlink"){
-          const response = await fetch(est.urlDatos);
-          const datos = await response.json();
-          const ts = datos.ts || datos.time;
-          if(ts) ultimaFecha = new Date(ts);
-        } else if(est.tipo === "italca") {
-          // No revisa fecha específica, se puede mejorar si la API da timestamp
-        } else {
-          const response = await fetch(est.urlDatos);
-          const texto = await response.text();
-          const lineas = texto.trim().split('\n');
-          const ultimaLinea = lineas[lineas.length-1];
-          const datos = ultimaLinea.trim().split(/\s+/);
-          const fecha = datos[0] || "-";
-          const hora = datos[1] || "-";
-          if(fecha !== "-" && hora !== "-"){
-            const partes = fecha.split("-");
-            const dia = parseInt(partes[0],10);
-            const mes = parseInt(partes[1],10)-1;
-            let anio = parseInt(partes[2],10);
-            if(anio<100) anio += 2000;
-            const partesHora = hora.split(":");
-            const horas = parseInt(partesHora[0],10);
-            const minutos = parseInt(partesHora[1],10);
-            const segundos = parseInt(partesHora[2],10);
-            ultimaFecha = new Date(anio, mes, dia, horas, minutos, segundos);
-          }
-        }
-      } catch(e){ console.error(e); }
-
-      if(ultimaFecha){
-        const diffMin = (new Date() - ultimaFecha)/1000/60;
-        if(diffMin>10){
-          marker.setStyle({color:"red", fillColor:"red"});
-        }
-      }
-    })();
-
-    // bind popup
-    marker.on('click', async ()=> {
-      let contenido;
-      if(est.tipo==="italca"){
-        contenido = await cargarDatosITALCA20(est.urlDatos, est.nombre);
-      } else if(est.tipo==="weatherlink"){
-        contenido = await cargarDatosWeatherLink(est.urlDatos, est.nombre);
-      } else {
-        contenido = await cargarDatos(est.urlDatos, est.nombre);
-      }
-      marker.bindPopup(contenido).openPopup();
+// Slideshow
+let slides = document.querySelectorAll(".slide");
+let currentIndex = 0;
+function showSlide(index) {
+    slides.forEach((slide, i) => {
+        slide.classList.remove("active");
+        if (i === index) slide.classList.add("active");
     });
-
-  });
 }
+setInterval(() => {
+    currentIndex = (currentIndex + 1) % slides.length;
+    showSlide(currentIndex);
+}, 3000);
 
-// ======= FILTRO =======
-document.getElementById("filtroEstaciones").addEventListener("change", function(){
-  const valor = this.value.toLowerCase();
-  let listaMostrar;
+// Modales
+const davisModal = document.getElementById("davisModal");
+const openDavis = document.getElementById("openDavisModal");
+const closeDavis = document.getElementById("closeDavisModal");
 
-  // Función que normaliza nombres: minúsculas y sin espacios extras
-  const normalizar = str => str.toLowerCase().trim();
+openDavis.onclick = e => { e.preventDefault(); davisModal.style.display = "block"; }
+closeDavis.onclick = () => davisModal.style.display = "none";
 
-  if(valor === "todas"){
-    listaMostrar = estaciones;
-  } else if(valor === "cuarzona"){
-    listaMostrar = estaciones.filter(e => grupoCuarzona.some(g => normalizar(g) === normalizar(e.nombre)));
-  } else if(valor === "prizona"){
-    listaMostrar = estaciones.filter(e => grupoPrizona.some(g => normalizar(g) === normalizar(e.nombre)));
-  } else if(valor === "sezona"){
-    listaMostrar = estaciones.filter(e => grupoSezona.some(g => normalizar(g) === normalizar(e.nombre)));
-  } else if(valor === "quinzona"){
-    listaMostrar = estaciones.filter(e => grupoQuinzona.some(g => normalizar(g) === normalizar(e.nombre)));
-  } else if(valor === "terzona"){
-    listaMostrar = estaciones.filter(e => grupoTerzona.some(g => normalizar(g) === normalizar(e.nombre)));
-  } else {
-    listaMostrar = estaciones;
-  }
+const youngModal = document.getElementById("youngModal");
+const openYoung = document.getElementById("openYoungModal");
+const closeYoung = document.getElementById("closeYoungModal");
 
-  mostrarEstaciones(listaMostrar);
-});
+openYoung.onclick = e => { e.preventDefault(); youngModal.style.display = "block"; }
+closeYoung.onclick = () => youngModal.style.display = "none";
 
-mostrarEstaciones(estaciones);
-
-mostrarEstaciones(estaciones);
-</script>
-<!-- Leyenda -->
-<div id="leyenda" style="
-  position:absolute;
-  bottom:20px;
-  right:20px;
-  background:white;
-  padding:10px 14px;
-  border-radius:8px;
-  font-family:sans-serif;
-  font-size:14px;
-  box-shadow:0 2px 6px rgba(0,0,0,0.3);
-  z-index:1000;
-">
-
-  <div style="display:flex;align-items:center;">
-    <span style="width:14px;height:14px;background:purple;border-radius:50%;display:inline-block;margin-right:6px;"></span>
-    <span>Estaciones Wunderground conectadas</span>
-  </div>
-  <div style="display:flex;align-items:center;">
-    <span style="width:14px;height:14px;background:green;border-radius:50%;display:inline-block;margin-right:6px;"></span>
-    <span>Estaciones Cumulus conectadas</span>
-  </div>
-  <div style="display:flex;align-items:center;margin-bottom:4px;">
-    <span style="width:14px;height:14px;background:#1E90FF;border-radius:50%;display:inline-block;margin-right:6px;"></span>
-    <span>Estaciones WeatherLink Conectadas</span>
-  </div>
-  <div style="display:flex;align-items:center;margin-bottom:4px;">
-    <span style="width:14px;height:14px;background:#FF4500;border-radius:50%;display:inline-block;margin-right:6px;"></span>
-    <span>Fuera de linea</span>
-  </div>
-
-</div>
-
-
-</body>
-</html>
-
+// Cerrar modal al hacer clic fuera
+window.onclick = e => {
+    if (e.target == davisModal) davisModal.style.display = "none";
+    if (e.target == youngModal) youngModal.style.display = "none";
+};
 </script>
 </body>
 </html>
