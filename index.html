@@ -50,6 +50,18 @@
   select#filtroEstaciones:hover { border-color: #0077b6; }
   select#filtroEstaciones:focus { border-color: #0077b6; box-shadow: 0 0 0 3px rgba(0,119,182,0.2); }
 
+  /* === ESTILO PARA EL TOOLTIP (Nombre al pasar el mouse) === */
+  .custom-tooltip {
+    background-color: #333 !important;
+    color: #fff !important;
+    border: 1px solid #fff !important;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  }
+
   /* === POPUP CARD (Diseño Tarjeta) === */
   .popup-card {
     font-family: 'Poppins', sans-serif;
@@ -59,7 +71,6 @@
     min-width: 280px;
     max-width: 320px;
   }
-  /* Ajuste para quitar estilos default de leaflet en el contenedor */
   .leaflet-popup-content-wrapper {
     border-radius: 16px;
     padding: 0;
@@ -76,7 +87,7 @@
     font-weight: 600;
     text-align: center;
     font-size: 1.1em;
-    margin: -10px -10px 10px -10px; /* Expande al borde */
+    margin: -10px -10px 10px -10px; 
   }
 
   .popup-card .dato {
@@ -92,9 +103,7 @@
     border-left: 3px solid transparent;
   }
   .popup-card .dato:hover { border-left: 3px solid #0077b6; background: #f1f3f5; }
-  
   .popup-card .label { font-weight: 600; color: #023e8a; }
-  
   hr { border: 0; border-top: 1px solid #eee; margin: 8px 0; }
 
   /* === LEYENDA INFERIOR === */
@@ -112,6 +121,7 @@
     width: 14px; height: 14px; border-radius: 50%;
     display: inline-block; margin-right: 8px;
     box-shadow: 0 0 2px rgba(0,0,0,0.3);
+    border: 1px solid white;
   }
 
   /* === TITULO MAPA === */
@@ -192,30 +202,28 @@ const estaciones = [
   { nombre: "Estación Faro Punta Tortuga", lat: -29.934023714271262, lng: -71.34265309651079, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/tortuga/realtime.txt" }, 
   { nombre: "Estación Capitanía de Puerto Los Vilos", lat: -31.909253646219067, lng: -71.51369361791026, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/losvilos/realtime.txt" },
   { nombre: "Estación Capitanía de Puerto de Quintero", lat: -32.776349435626926, lng: -71.52671123750042, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/quintero/realtime.txt" }, 
-  { nombre: "Estación Capitanía de Puerto de Valparaiso", lat: -33.03188018297202, lng: -71.62074313595514, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/valparaiso/realtime.txt" },   
+  { nombre: "Estación Capitanía de Puerto de Valparaiso", lat: -33.03188018297202, lng: -71.62074313595514, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/valparaiso/realtime.txt" },    
   { nombre: "Estación Faro Punta Panul", lat: -33.57495847911209, lng: -71.62519579280797, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/Panul/realtime.txt" },
-  { nombre: "Estación Capitanía de Puerto de Juan Fernandez", lat: -33.63802752416446, lng: -78.845035348829, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/cumberland/realtime.txt" },   
+  { nombre: "Estación Capitanía de Puerto de Juan Fernandez", lat: -33.63802752416446, lng: -78.845035348829, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/cumberland/realtime.txt" },    
   { nombre: "Estación Capitanía de Puerto de Pichilemu", lat: -34.38493577549411, lng: -72.00852413425875, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/Pichilemu/realtime.txt" },  
 
-  // Estaciones conectados a Weatherlink
   { nombre: "Club de Yates Recreo (Viña del Mar)", lat: -33.025800631105966, lng: -71.58181362573575, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/0c66339eed4f47d4a9240ced0b66c982" },    
   { nombre: "Dique Flotante Valparaíso III", lat: -33.03791961912313, lng: -71.62323350855557, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/1e4869cc59824e6893fc56b963304664" }, 
   { nombre: "WL Chilquinta Muelle Barón (Valparaíso)", lat: -33.04072917355454, lng: -71.60838140610412, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/6342b5802c8542f6a359487f335f3718" },      
   { nombre: "Cofradía Náutica del Pacífico (Algarrobo)", lat: -33.362179217587844, lng: -71.68543893307947, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/9fa531d050e648a9a8aa6bb7026c3902" },    
 
 // ======= SEZONA =======
-  { nombre: "Estación Capitanía de Puerto de Corral", lat: -39.887789132819336, lng: -73.42781070392009, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/corral/realtime.txt" },   
+  { nombre: "Estación Capitanía de Puerto de Corral", lat: -39.887789132819336, lng: -73.42781070392009, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/corral/realtime.txt" },    
   { nombre: "Estación Capitanía de Puerto de Carahue", lat: -38.788423273400966, lng: -73.39718655933679, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/carahue/realtime.txt" }, 
-  { nombre: "Estación Capitanía de Puerto de Lebu", lat: -37.604808697386304, lng: -73.6537885217902, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/lebu/realtime.txt" },   
+  { nombre: "Estación Capitanía de Puerto de Lebu", lat: -37.604808697386304, lng: -73.6537885217902, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/lebu/realtime.txt" },    
   { nombre: "Estación Capitanía de Puerto de Lota", lat: -37.09718322738166, lng: -73.15947726291334, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/lota/realtime.txt" }, 
   { nombre: "Estación Capitanía de Puerto de Coronel", lat: -37.027302010958486, lng: -73.14885352186091, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/coronel/realtime.txt" },  
   { nombre: "Estación Centro Meteorológico de Talcahuano", lat: -36.70798310695746, lng: -73.11343866909345, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/talcahuano/realtime.txt" },  
   { nombre: "Estación Capitanía de Puerto de Lirquén", lat: -36.71136815014315, lng: -72.97771208216336, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/lirquen/realtime.txt" }, 
   { nombre: "Estación Capitanía de Puerto de Constitución", lat: -35.32437344009416, lng: -72.4084436325508, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/constitucion/realtime.txt" },
 
-  // Estaciones conectados a Wunderground
   { nombre: "Estación Faro Isla Quiriquina", lat: -36.611578766421566, lng: -73.05240787211854, tipo: "italca", urlDatos: "https://api.weather.com/v2/pws/observations/current?apiKey=e1f10a1e78da46f5b10a1e78da96f525&stationId=ITALCA20&numericPrecision=decimal&format=json&units=e" },
-  { nombre: "Estación Faro Punta Hualpén", lat: -36.74696850236329, lng: -73.19139812862069, tipo: "italca", urlDatos: "https://api.weather.com/v2/pws/observations/current?apiKey=e1f10a1e78da46f5b10a1e78da96f525&stationId=IHUALP1&numericPrecision=decimal&format=json&units=e" },   
+  { nombre: "Estación Faro Punta Hualpén", lat: -36.74696850236329, lng: -73.19139812862069, tipo: "italca", urlDatos: "https://api.weather.com/v2/pws/observations/current?apiKey=e1f10a1e78da46f5b10a1e78da96f525&stationId=IHUALP1&numericPrecision=decimal&format=json&units=e" },    
 
 // ======= QUINZONA =======
   { nombre: "Estación Quinzona - Isla Tenglo", lat: -41.48661084352241, lng: -72.9512652000025, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/quinzona" },  
@@ -230,7 +238,6 @@ const estaciones = [
   { nombre: "Estación Capitanía de Puerto de Chaitén", lat: -42.9147, lng: -72.7120, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/chaiten" },
   { nombre: "Estación Capitanía de Puerto de Quellón", lat: -43.1206, lng: -73.6216, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/quellon" },
 
-  // Estaciones conectados a Weatherlink
   { nombre: "Club Náutico Reloncaví", lat: -41.4990, lng: -72.9881, tipo: "weatherlink", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/davis-reloncavi" },
   { nombre: "Alcaldía De Mar Tabón", lat: -41.91093767973031, lng: -73.13828997867896, tipo: "weatherlink", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/davis-tabon" },
   { nombre: "Caleta La Arena", lat: -41.691549839025065, lng: -72.64180999361956, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/pcFPvOKrhY6669s5Bu4fo3bFnqTagixd" },
@@ -242,77 +249,15 @@ const estaciones = [
   { nombre: "Estación Alcaldía de mar Navarino", lat: -54.5532, lng: -68.1926, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/navarino/realtime.txt" },
   { nombre: "Estación Capitanía de Puerto Edén", lat: -49.0745, lng: -74.2545, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/eden/realtime.txt" },
   { nombre: "Estación Alcaldía de mar corrientes", lat: -54.5919, lng: -68.2040, tipo: "normal", urlDatos: "https://corsproxy.io/?https://web.directemar.cl/met/jturno/estaciones/corrientes/realtime.txt" },
-  { nombre: "Muelle Capitán Guillermos Punta Arenas", lat: -55.4990, lng: -83.9881, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/aa24908f6c68472ba163e55765986705" }, 
+  { nombre: "Muelle Capitán Guillermos Punta Arenas", lat: -53.1362, lng: -70.8872, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/aa24908f6c68472ba163e55765986705" }, 
 ];
 
 // ======= GRUPOS =======
-const grupoCuarzona = [
-  "Estación Capitanía de Puerto de Arica",
-  "Estación Alcaldía de mar Pisagua",
-  "Estación Gobernación Marítima de Iquique",
-  "Estación Capitanía de Puerto de Patache",
-  "Estación Capitanía de Puerto de Tocopilla",
-  "Estación Capitanía de Puerto de Mejillones",
-  "Estación Capitanía de Puerto de Taltal",
-];
-
-const grupoPrizona = [
-  "Estación Capitanía de Puerto de Chañaral",
-  "Estación Capitanía de Puerto de Caldera",
-  "Estación Capitanía de Puerto de Hanga Roa",
-  "Estación Capitanía de Puerto de Huasco",
-  "Estación Faro Punta Tortuga",
-  "Estación Capitanía de Puerto Los Vilos",
-  "Estación Capitanía de Puerto de Quintero",
-  "Estación Capitanía de Puerto de Valparaiso",
-  "Estación Faro Punta Panul",
-  "Estación Capitanía de Puerto de Juan Fernandez",
-  "Estación Capitanía de Puerto de Pichilemu",
-  "Club de Yates Recreo (Viña del Mar)",
-  "WL Chilquinta Muelle Barón (Valparaíso)",
-  "Dique Flotante Valparaíso III",
-  "Cofradía Náutica del Pacífico (Algarrobo)",
-];
-
-const grupoSezona = [
-  "Estación Capitanía de Puerto de Corral",
-  "Estación Capitanía de Puerto de Carahue",
-  "Estación Capitanía de Puerto de Lebu",
-  "Estación Capitanía de Puerto de Lota",
-  "Estación Capitanía de Puerto de Coronel",
-  "Estación Centro Meteorológico de Talcahuano",
-  "Estación Capitanía de Puerto de Lirquén",
-  "Estación Capitanía de Puerto de Constitución",
-  "Estación Faro Isla Quiriquina",
-  "Estación Faro Punta Hualpén",
-];
-
-const grupoQuinzona = [
-  "Estación Quinzona - Isla Tenglo",
-  "Club Náutico Reloncaví",
-  "Estación Capitanía de Puerto de Maullín",
-  "Estación Alcaldía de mar Chacao",
-  "Estación Capitanía de Puerto de Ancud",
-  "Estación Capitanía de Puerto de Quemchi",
-  "Estación Capitanía de Puerto de Chonchi",
-  "Estación Capitanía de Puerto de Chaitén",
-  "Estación Capitanía de Puerto de Quellón",
-  "Estación Capitanía de Puerto de Melinka",
-  "Estación Capitanía de Puerto de Aguirre",
-  "Estación Capitanía de Puerto de Chacabuco",
-  "Alcaldía De Mar Tabón",
-  "Caleta Puelche",
-  "Caleta La Arena",
-  "Portuaria Cabo Froward",
-];
-
-const grupoTerzona = [
-  "Estación Alcaldía de mar Timbales",
-  "Estación Alcaldía de mar Navarino",
-  "Estación Capitanía de Puerto Edén",
-  "Estación Alcaldía de mar corrientes",
-  "Muelle Capitán Guillermos Punta Arenas",
-];
+const grupoCuarzona = [ "Estación Capitanía de Puerto de Arica", "Estación Alcaldía de mar Pisagua", "Estación Gobernación Marítima de Iquique", "Estación Capitanía de Puerto de Patache", "Estación Capitanía de Puerto de Tocopilla", "Estación Capitanía de Puerto de Mejillones", "Estación Capitanía de Puerto de Taltal" ];
+const grupoPrizona = [ "Estación Capitanía de Puerto de Chañaral", "Estación Capitanía de Puerto de Caldera", "Estación Capitanía de Puerto de Hanga Roa", "Estación Capitanía de Puerto de Huasco", "Estación Faro Punta Tortuga", "Estación Capitanía de Puerto Los Vilos", "Estación Capitanía de Puerto de Quintero", "Estación Capitanía de Puerto de Valparaiso", "Estación Faro Punta Panul", "Estación Capitanía de Puerto de Juan Fernandez", "Estación Capitanía de Puerto de Pichilemu", "Club de Yates Recreo (Viña del Mar)", "WL Chilquinta Muelle Barón (Valparaíso)", "Dique Flotante Valparaíso III", "Cofradía Náutica del Pacífico (Algarrobo)" ];
+const grupoSezona = [ "Estación Capitanía de Puerto de Corral", "Estación Capitanía de Puerto de Carahue", "Estación Capitanía de Puerto de Lebu", "Estación Capitanía de Puerto de Lota", "Estación Capitanía de Puerto de Coronel", "Estación Centro Meteorológico de Talcahuano", "Estación Capitanía de Puerto de Lirquén", "Estación Capitanía de Puerto de Constitución", "Estación Faro Isla Quiriquina", "Estación Faro Punta Hualpén" ];
+const grupoQuinzona = [ "Estación Quinzona - Isla Tenglo", "Club Náutico Reloncaví", "Estación Capitanía de Puerto de Maullín", "Estación Alcaldía de mar Chacao", "Estación Capitanía de Puerto de Ancud", "Estación Capitanía de Puerto de Quemchi", "Estación Capitanía de Puerto de Chonchi", "Estación Capitanía de Puerto de Chaitén", "Estación Capitanía de Puerto de Quellón", "Estación Capitanía de Puerto de Melinka", "Estación Capitanía de Puerto de Aguirre", "Estación Capitanía de Puerto de Chacabuco", "Alcaldía De Mar Tabón", "Caleta Puelche", "Caleta La Arena", "Portuaria Cabo Froward" ];
+const grupoTerzona = [ "Estación Alcaldía de mar Timbales", "Estación Alcaldía de mar Navarino", "Estación Capitanía de Puerto Edén", "Estación Alcaldía de mar corrientes", "Muelle Capitán Guillermos Punta Arenas" ];
 
 
 // ======= FUNCIONES AUXILIARES =======
@@ -321,7 +266,6 @@ function convertirGradosAPuntoCardinal(grados){
   return direcciones[Math.round(grados/22.5)%16];
 }
 
-// Función especial para ITALCA20 -- Wunderground
 async function cargarDatosITALCA20(urlDatos, nombre){
   try{
     const proxyUrl = 'https://corsproxy.io/?url=' + encodeURIComponent(urlDatos);
@@ -354,46 +298,9 @@ async function cargarDatosITALCA20(urlDatos, nombre){
         <div class="dato"><span class="label">🌬 Viento:</span> ${direccionCardinal} ${velocidadNudos} nds</div>
         <div class="dato"><span class="label">💨 Rachas:</span> ${rachasNudos} nds</div>
       </div>`;
-  }catch(e){ console.error(e); return "<div class='popup-card'>Error al cargar datos ITALCA20</div>"; }
+  }catch(e){ return "<div class='popup-card'>Error al cargar datos ITALCA20</div>"; }
 }
 
-// Función especial para IHUALP1
-async function cargarDatosIHUALP1(urlDatos, nombre){
-  try{
-    const proxyUrl = 'https://corsproxy.io/?url=' + encodeURIComponent(urlDatos);
-    const response = await fetch(proxyUrl);
-    const data = await response.json();
-    const obs = data.observations[0];
-    const fechaObj = new Date(obs.obsTimeLocal);
-    const dia = String(fechaObj.getDate()).padStart(2,'0');
-    const mes = String(fechaObj.getMonth()+1).padStart(2,'0');
-    const año = fechaObj.getFullYear();
-    const hora = String(fechaObj.getHours()).padStart(2,'0') + ':' + String(fechaObj.getMinutes()).padStart(2,'0');
-    const direccionGrados = obs.winddir || 0;
-    const direccionCardinal = convertirGradosAPuntoCardinal(direccionGrados);
-    const velocidadNudos = (obs.imperial.windSpeed*0.868976).toFixed(1);
-    const rachasNudos = (obs.imperial.windGust*0.868976).toFixed(1);
-    const temperaturaC = ((obs.imperial.temp-32)*5/9).toFixed(1);
-    const puntoRocioC = ((obs.imperial.dewpt-32)*5/9).toFixed(1);
-    const presionhPa = (obs.imperial.pressure*33.8639).toFixed(1);
-    const humedad = obs.humidity;
-
-    return `
-      <div class="popup-card">
-        <div class="titulo">📡 ${nombre}</div>
-        <div class="dato" style="justify-content:center; color:#555;">📅 Act: ${dia}/${mes}/${año} ${hora}</div>
-        <hr>
-        <div class="dato"><span class="label">🌡 Temp:</span> ${temperaturaC} °C</div>
-        <div class="dato"><span class="label">💧 Humedad:</span> ${humedad} %</div>
-        <div class="dato"><span class="label">🌫 Rocío:</span> ${puntoRocioC} °C</div>
-        <div class="dato"><span class="label">🧭 Presión:</span> ${presionhPa} hPa</div>
-        <div class="dato"><span class="label">🌬 Viento:</span> ${direccionCardinal} ${velocidadNudos} nds</div>
-        <div class="dato"><span class="label">💨 Rachas:</span> ${rachasNudos} nds</div>
-      </div>`;
-  }catch(e){ console.error(e); return "<div class='popup-card'>Error al cargar datos IHUALP1</div>"; }
-}
-
-// FUNCION CUMULUS
 async function cargarDatos(urlDatos, nombre){
   try{
     const response = await fetch(urlDatos);
@@ -419,15 +326,13 @@ async function cargarDatos(urlDatos, nombre){
         <div class="dato"><span class="label">💨 Rachas:</span> ${datos[40]||"-"} nds</div>
         <div class="dato"><span class="label">🌧️ Lluvia:</span> ${datos[9]||"-"} mm</div>
       </div>`;
-  }catch(e){ console.error(e); return "<div class='popup-card'>Error al cargar los datos.</div>"; }
+  }catch(e){ return "<div class='popup-card'>Error al cargar los datos.</div>"; }
 }
 
-//FUNCION WEATHERLINK
 async function cargarDatosWeatherLink(urlDatos, nombre){
   try{
     const response = await fetch(urlDatos);
-    let datos = {};
-    try { datos = await response.json(); } catch(e){ datos={}; }
+    let datos = await response.json();
     let ultimaAct;
     if(datos.ts || datos.time){
       const ts = new Date(datos.ts || datos.time);
@@ -450,7 +355,7 @@ async function cargarDatosWeatherLink(urlDatos, nombre){
         <div class="dato"><span class="label">💨 Rachas:</span> ${racha} nds</div>
         <div class="dato"><span class="label">🌧️ Lluvia:</span> ${datos.rain || "-"} mm</div>
       </div>`;
-  }catch(e){ console.error(e); return "<div class='popup-card'>Error al cargar WeatherLink</div>"; }
+  }catch(e){ return "<div class='popup-card'>Error al cargar WeatherLink</div>"; }
 }
 
 
@@ -471,7 +376,6 @@ tituloControlBottom.addTo(map);
 let marcadores = [];
 
 async function mostrarEstaciones(lista){
-  // Eliminar marcadores previos
   marcadores.forEach(m => map.removeLayer(m));
   marcadores = [];
 
@@ -480,15 +384,33 @@ async function mostrarEstaciones(lista){
 
     const marker = L.circleMarker([est.lat, est.lng], {
       radius: 10,
-      color: colorMarcador,
+      color: "#ffffff",
       fillColor: colorMarcador,
-      fillOpacity: 0.6,
+      fillOpacity: 0.8,
       weight: 2
     }).addTo(map);
 
+    // --- NUEVO: NOMBRE AL PASAR EL MOUSE (Tooltip) ---
+    marker.bindTooltip(est.nombre, { 
+        direction: 'top', 
+        offset: [0, -10], 
+        className: 'custom-tooltip' 
+    });
+
+    // --- NUEVO: RESALTE AL PASAR EL MOUSE (Efecto Visual) ---
+    marker.on('mouseover', function (e) {
+      this.setRadius(14); // Agranda el círculo
+      this.setStyle({ weight: 4, fillOpacity: 1 });
+    });
+
+    marker.on('mouseout', function (e) {
+      this.setRadius(10); // Vuelve al tamaño normal
+      this.setStyle({ weight: 2, fillOpacity: 0.8 });
+    });
+
     marcadores.push(marker);
 
-    // Verificar si está fuera de línea
+    // Verificar si está fuera de línea (Lógica original)
     (async()=>{
       let ultimaFecha;
       try {
@@ -498,7 +420,7 @@ async function mostrarEstaciones(lista){
           const ts = datos.ts || datos.time;
           if(ts) ultimaFecha = new Date(ts);
         } else if(est.tipo === "italca") {
-          // No revisa fecha específica, se puede mejorar si la API da timestamp
+           // Omitido para ITALCA según original
         } else {
           const response = await fetch(est.urlDatos);
           const texto = await response.text();
@@ -520,17 +442,16 @@ async function mostrarEstaciones(lista){
             ultimaFecha = new Date(anio, mes, dia, horas, minutos, segundos);
           }
         }
-      } catch(e){ console.error(e); }
+      } catch(e){ }
 
       if(ultimaFecha){
         const diffMin = (new Date() - ultimaFecha)/1000/60;
         if(diffMin>10){
-          marker.setStyle({color:"#FF4500", fillColor:"#FF4500"}); // Naranja rojizo para offline
+          marker.setStyle({color:"#ffffff", fillColor:"#FF4500"}); // Naranja si está caído
         }
       }
     })();
 
-    // bind popup
     marker.on('click', async ()=> {
       let contenido;
       if(est.tipo==="italca"){
@@ -549,8 +470,6 @@ async function mostrarEstaciones(lista){
 document.getElementById("filtroEstaciones").addEventListener("change", function(){
   const valor = this.value.toLowerCase();
   let listaMostrar;
-
-  // Función que normaliza nombres: minúsculas y sin espacios extras
   const normalizar = str => str.toLowerCase().trim();
 
   if(valor === "todas"){
@@ -568,7 +487,6 @@ document.getElementById("filtroEstaciones").addEventListener("change", function(
   } else {
     listaMostrar = estaciones;
   }
-
   mostrarEstaciones(listaMostrar);
 });
 
