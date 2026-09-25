@@ -278,18 +278,14 @@ function convertirGradosAPuntoCardinal(grados){
 
 async function cargarDatosITALCA20(urlDatos, nombre){
   try {
-    // 1. Llamada directa a tu Worker (sin proxy)
     const response = await fetch(urlDatos);
     
-    // 2. Comprobar si la ruta existe y responde bien (código 200)
     if (!response.ok) {
       throw new Error(`Error de conexión: ${response.status}`);
     }
 
-    // 3. Convertir la respuesta a JSON
     const data = await response.json();
 
-    // 4. Comprobar que Wunderground realmente envió datos (a veces las estaciones se caen)
     if (!data || !data.observations || data.observations.length === 0) {
       throw new Error("Estación fuera de línea (sin datos).");
     }
@@ -304,7 +300,6 @@ async function cargarDatosITALCA20(urlDatos, nombre){
     const direccionGrados = obs.winddir || 0;
     const direccionCardinal = convertirGradosAPuntoCardinal(direccionGrados);
     
-    // 5. Validar que el objeto 'imperial' existe antes de calcular
     if(!obs.imperial) {
        throw new Error("Formato de datos incorrecto de Wunderground.");
     }
@@ -315,6 +310,10 @@ async function cargarDatosITALCA20(urlDatos, nombre){
     const puntoRocioC = ((obs.imperial.dewpt - 32) * 5/9).toFixed(1);
     const presionhPa = (obs.imperial.pressure * 33.8639).toFixed(1);
     const humedad = obs.humidity;
+    
+    // Extracción y conversión de lluvia (de pulgadas a milímetros)
+    const lluviaPulgadas = obs.imperial.precipTotal || 0;
+    const lluviaMm = (lluviaPulgadas * 25.4).toFixed(1);
 
     return `
       <div class="popup-card">
@@ -327,11 +326,11 @@ async function cargarDatosITALCA20(urlDatos, nombre){
         <div class="dato"><span class="label">🧭 Presión:</span> ${presionhPa} hPa</div>
         <div class="dato"><span class="label">🌬 Viento:</span> ${direccionCardinal} ${velocidadNudos} nds</div>
         <div class="dato"><span class="label">💨 Rachas:</span> ${rachasNudos} nds</div>
+        <div class="dato"><span class="label">🌧️ Lluvia:</span> ${lluviaMm} mm</div>
       </div>`;
       
   } catch(e) { 
     console.error(`Fallo en ${nombre}:`, e);
-    // Ahora la tarjeta te mostrará exactamente POR QUÉ falló
     return `
       <div class='popup-card'>
         <div class="titulo" style="background:#d90429;">⚠️ ${nombre}</div>
