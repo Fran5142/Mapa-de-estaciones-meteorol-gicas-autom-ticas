@@ -277,23 +277,43 @@ function convertirGradosAPuntoCardinal(grados){
 }
 
 async function cargarDatosITALCA20(urlDatos, nombre){
-  try{
-    const proxyUrl = 'https://corsproxy.io/?url=' + encodeURIComponent(urlDatos);
-    const response = await fetch(proxyUrl);
+  try {
+    // 1. Llamada directa a tu Worker (sin proxy)
+    const response = await fetch(urlDatos);
+    
+    // 2. Comprobar si la ruta existe y responde bien (código 200)
+    if (!response.ok) {
+      throw new Error(`Error de conexión: ${response.status}`);
+    }
+
+    // 3. Convertir la respuesta a JSON
     const data = await response.json();
+
+    // 4. Comprobar que Wunderground realmente envió datos (a veces las estaciones se caen)
+    if (!data || !data.observations || data.observations.length === 0) {
+      throw new Error("Estación fuera de línea (sin datos).");
+    }
+
     const obs = data.observations[0];
     const fechaObj = new Date(obs.obsTimeLocal);
     const dia = String(fechaObj.getDate()).padStart(2,'0');
     const mes = String(fechaObj.getMonth()+1).padStart(2,'0');
     const año = fechaObj.getFullYear();
     const hora = String(fechaObj.getHours()).padStart(2,'0') + ':' + String(fechaObj.getMinutes()).padStart(2,'0');
+    
     const direccionGrados = obs.winddir || 0;
     const direccionCardinal = convertirGradosAPuntoCardinal(direccionGrados);
-    const velocidadNudos = (obs.imperial.windSpeed*0.868976).toFixed(1);
-    const rachasNudos = (obs.imperial.windGust*0.868976).toFixed(1);
-    const temperaturaC = ((obs.imperial.temp-32)*5/9).toFixed(1);
-    const puntoRocioC = ((obs.imperial.dewpt-32)*5/9).toFixed(1);
-    const presionhPa = (obs.imperial.pressure*33.8639).toFixed(1);
+    
+    // 5. Validar que el objeto 'imperial' existe antes de calcular
+    if(!obs.imperial) {
+       throw new Error("Formato de datos incorrecto de Wunderground.");
+    }
+
+    const velocidadNudos = (obs.imperial.windSpeed * 0.868976).toFixed(1);
+    const rachasNudos = (obs.imperial.windGust * 0.868976).toFixed(1);
+    const temperaturaC = ((obs.imperial.temp - 32) * 5/9).toFixed(1);
+    const puntoRocioC = ((obs.imperial.dewpt - 32) * 5/9).toFixed(1);
+    const presionhPa = (obs.imperial.pressure * 33.8639).toFixed(1);
     const humedad = obs.humidity;
 
     return `
@@ -308,7 +328,18 @@ async function cargarDatosITALCA20(urlDatos, nombre){
         <div class="dato"><span class="label">🌬 Viento:</span> ${direccionCardinal} ${velocidadNudos} nds</div>
         <div class="dato"><span class="label">💨 Rachas:</span> ${rachasNudos} nds</div>
       </div>`;
-  }catch(e){ return "<div class='popup-card'>Error al cargar datos ITALCA20</div>"; }
+      
+  } catch(e) { 
+    console.error(`Fallo en ${nombre}:`, e);
+    // Ahora la tarjeta te mostrará exactamente POR QUÉ falló
+    return `
+      <div class='popup-card'>
+        <div class="titulo" style="background:#d90429;">⚠️ ${nombre}</div>
+        <div class="dato" style="justify-content:center; color:#d90429; font-weight:bold;">
+           Error: ${e.message}
+        </div>
+      </div>`; 
+  }
 }
 
 async function cargarDatos(urlDatos, nombre){
