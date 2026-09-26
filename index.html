@@ -1,236 +1,137 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mapa de Estaciones Meteorológicas</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
-  /* === ESTILOS GENERALES === */
-  body { margin: 0; padding: 0; font-family: 'Poppins', sans-serif; overflow: hidden; }
-  #map { height: 100vh; width: 100%; z-index: 1; }
-
-  /* === CONTROLES FLOTANTES (Selector y Leyenda) === */
-  .floating-ctrl {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(8px); /* Efecto vidrio */
-    border-radius: 12px;
-    padding: 12px 16px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    border: 1px solid rgba(255,255,255,0.6);
-    z-index: 1000;
-  }
-
-  /* === SELECTOR SUPERIOR === */
-  .selector-container {
-    position: absolute;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    text-align: center;
-    width: 90%;
-    max-width: 400px;
-  }
-  
-  select#filtroEstaciones {
-    width: 100%;
-    padding: 10px 15px;
-    font-size: 16px;
-    font-family: 'Poppins', sans-serif;
-    color: #333;
-    background-color: transparent;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    cursor: pointer;
-    outline: none;
-    transition: all 0.3s ease;
-  }
-  select#filtroEstaciones:hover { border-color: #0077b6; }
-  select#filtroEstaciones:focus { border-color: #0077b6; box-shadow: 0 0 0 3px rgba(0,119,182,0.2); }
-
-  /* === ESTILO PARA EL TOOLTIP (Nombre al pasar el mouse) === */
-  .custom-tooltip {
-    background-color: #333 !important;
-    color: #fff !important;
-    border: 1px solid #fff !important;
-    border-radius: 4px;
-    padding: 4px 8px;
-    font-family: 'Poppins', sans-serif;
-    font-size: 12px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-  }
-
-  /* === POPUP CARD (Diseño Tarjeta) === */
-  .popup-card {
-    font-family: 'Poppins', sans-serif;
-    background: #ffffff;
-    padding: 10px;
-    border-radius: 12px;
-    min-width: 280px;
-    max-width: 320px;
-  }
-  .leaflet-popup-content-wrapper {
-    border-radius: 16px;
-    padding: 0;
-    overflow: hidden;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-  }
-  .leaflet-popup-content { margin: 0; width: auto !important; }
-
-  .popup-card .titulo {
-    background: linear-gradient(135deg, #0077b6, #0096c7);
-    color: white;
-    padding: 12px;
-    border-radius: 12px 12px 0 0;
-    font-weight: 600;
-    text-align: center;
-    font-size: 1.1em;
-    margin: -10px -10px 10px -10px; 
-  }
-
-  .popup-card .dato {
-    margin: 6px 0;
-    font-size: 0.95em;
-    color: #444;
-    padding: 6px 10px;
-    border-radius: 6px;
-    background: #f8f9fa;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-left: 3px solid transparent;
-  }
-  .popup-card .dato:hover { border-left: 3px solid #0077b6; background: #f1f3f5; }
-  .popup-card .label { font-weight: 600; color: #023e8a; }
-  hr { border: 0; border-top: 1px solid #eee; margin: 8px 0; }
-
-  /* === LEYENDA INFERIOR === */
-  .leyenda-container {
-    position: absolute;
-    bottom: 30px;
-    right: 20px;
-    font-size: 13px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .leyenda-item { display: flex; align-items: center; }
-  .dot {
-    width: 14px; height: 14px; border-radius: 50%;
-    display: inline-block; margin-right: 8px;
-    box-shadow: 0 0 2px rgba(0,0,0,0.3);
-    border: 1px solid white;
-  }
-
-  /* === TITULO MAPA === */
-  .map-title-bottom h2 {
-    font-family: 'Poppins', sans-serif;
-    font-size: 16px;
-    font-weight: 600;
-    color: #333;
-    margin: 0;
-    padding: 8px 16px;
-    background: rgba(255,255,255,0.9);
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  }
-
-  /* === RESPONSIVE === */
-  @media (max-width: 768px) {
-    .selector-container { width: 85%; top: 10px; }
-    .popup-card { min-width: 250px; }
-    .leyenda-container { bottom: 25px; right: 10px; max-width: 200px; }
-  }
+:root{--ink:#eaf4ff;--muted:#a9c3d8;--panel:rgba(7,24,43,.9);--line:rgba(160,205,232,.2);--cyan:#5ee7f5;--shadow:0 22px 65px rgba(0,10,24,.38)}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;font-family:'Poppins',sans-serif;background:#081a2a;color:var(--ink)}
+body{overflow:hidden}
+#map{height:100vh;width:100%;z-index:1;background:#dce8ed}
+.floating-ctrl{background:var(--panel);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);color:var(--ink)}
+.topbar{position:absolute;z-index:1000;top:16px;left:50%;transform:translateX(-50%);width:min(1040px,calc(100vw - 36px));padding:12px 16px;display:grid;grid-template-columns:minmax(220px,1fr) minmax(165px,.72fr) minmax(260px,1.2fr) auto;align-items:center;gap:12px;border-radius:17px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand-mark{display:grid;place-items:center;flex:0 0 38px;height:38px;border-radius:12px;background:linear-gradient(145deg,#5ee7f5,#147de2);font-size:19px;box-shadow:0 8px 24px #147de259}
+.brand h1{font-size:13px;line-height:1.25;margin:0;font-weight:600;white-space:nowrap}
+.brand p{font-size:9px;color:var(--muted);margin:3px 0 0;letter-spacing:.1em;text-transform:uppercase}
+.control-label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+select#filtroEstaciones,.search-wrap input{width:100%;height:40px;padding:9px 12px;font:inherit;font-size:12px;color:var(--ink);background:rgba(229,244,255,.08);border:1px solid var(--line);border-radius:11px;outline:none;transition:.2s}
+select#filtroEstaciones option{color:#132b40;background:#fff}
+select#filtroEstaciones:focus,.search-wrap input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #5ee7f522}
+.search-wrap{position:relative}
+.search-wrap input{padding-left:36px}
+.search-icon{position:absolute;left:12px;top:8px;color:#90adbf;font-size:17px;pointer-events:none}
+.view-button{height:40px;padding:0 15px;border:0;border-radius:11px;background:linear-gradient(120deg,#11b8c9,#147de2);color:white;font:600 11px 'Poppins',sans-serif;white-space:nowrap;cursor:pointer;box-shadow:0 7px 18px #147de244;transition:transform .18s,filter .18s}
+.view-button:hover{filter:brightness(1.12);transform:translateY(-1px)}
+.view-button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.leyenda-container{position:absolute;z-index:1000;right:22px;bottom:28px;font-size:11px;padding:15px 17px;display:flex;flex-direction:column;gap:10px;min-width:176px}
+.legend-title{font-size:9px;color:var(--muted);font-weight:600;letter-spacing:.14em;text-transform:uppercase}
+.leyenda-item{display:flex;align-items:center}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:9px;box-shadow:0 0 10px currentColor;border:1px solid #fffa}
+.custom-tooltip{background:#07182b!important;color:#fff!important;border:1px solid #5ee7f580!important;border-radius:9px;padding:6px 10px;font:11px 'Poppins',sans-serif;box-shadow:0 8px 20px #0004}
+.popup-card{font-family:'Poppins',sans-serif;background:#fff;padding:10px;border-radius:15px;min-width:270px;max-width:320px;color:#334155}
+.leaflet-popup-content-wrapper{border-radius:17px;padding:0;overflow:hidden;box-shadow:0 15px 38px #0005}
+.leaflet-popup-content{margin:0;width:auto!important}
+.popup-card .titulo{background:linear-gradient(120deg,#073b65,#087fbd 60%,#24bacb);color:white;padding:13px 12px;border-radius:14px 14px 0 0;font-weight:600;text-align:center;font-size:1em;margin:-10px -10px 10px}
+.popup-card .dato{margin:5px 0;font-size:.88em;color:#405366;padding:7px 10px;border-radius:8px;background:#f2f7fa;display:flex;justify-content:space-between;align-items:center;border-left:3px solid transparent}
+.popup-card .dato:hover{border-left-color:#11a9d0;background:#eaf5fa}
+.popup-card .label{font-weight:600;color:#075985}
+hr{border:0;border-top:1px solid #e8eef2;margin:8px 0}
+.leaflet-control-layers{border:1px solid var(--line)!important;border-radius:12px!important;overflow:hidden;box-shadow:var(--shadow)!important}
+.leaflet-control-layers-toggle{width:40px!important;height:40px!important}
+.leaflet-control-layers-expanded{background:#07182bed;color:#eaf4ff;padding:10px 12px}
+.leaflet-control-layers-separator{border-top-color:var(--line)}
+.leaflet-control-attribution{font-size:9px}
+.leaflet-top.leaflet-right{top:82px}
+@media(max-width:950px){
+  .topbar{top:10px;width:calc(100vw - 20px);padding:11px;grid-template-columns:minmax(0,1fr) auto;gap:9px}
+  .brand{grid-column:1/-1}
+  .brand p{display:none}
+  .brand h1{font-size:12px}
+  .topbar select#filtroEstaciones{grid-column:1}
+  .search-wrap{grid-column:2;min-width:0;width:min(42vw,270px)}
+  .view-button{grid-column:1/-1;width:100%;height:36px}
+  .leyenda-container{right:12px;bottom:20px;padding:11px 13px;min-width:145px;gap:7px;font-size:10px}
+  .leaflet-top.leaflet-right{top:205px}
+}
+@media(max-width:390px){
+  .topbar{grid-template-columns:1fr 1fr}
+  .topbar select#filtroEstaciones,.topbar .search-wrap{width:100%;min-width:0}
+  .view-button{grid-column:1/-1}
+}
 </style>
 </head>
 <body>
 
-<div class="selector-container floating-ctrl">
-  <select id="filtroEstaciones">
-    <option value="todas">🌎 Ver todas las estaciones</option>
+<nav class="topbar floating-ctrl" aria-label="Buscar estaciones meteorológicas">
+  <div class="brand"><div class="brand-mark">🌦️</div><div><h1>Estaciones Meteorológicas Automáticas</h1><p>Red de monitoreo costero</p></div></div>
+  <label class="control-label" for="filtroEstaciones">Filtrar por zona</label>
+  <select id="filtroEstaciones" aria-label="Filtrar estaciones por zona">
+    <option value="todas">🌎 Todas las zonas</option>
     <option value="cuarzona">📍 Cuarzona</option>
     <option value="prizona">📍 Prizona</option>
     <option value="sezona">📍 Sezona</option>
     <option value="quinzona">📍 Quinzona</option>
     <option value="terzona">📍 Terzona</option>
   </select>
-</div>
+  <label class="control-label" for="buscarEstacion">Buscar estación</label>
+  <div class="search-wrap"><span class="search-icon">⌕</span><input id="buscarEstacion" type="search" list="listaEstaciones" placeholder="Buscar estación…" autocomplete="off" aria-label="Buscar estación"></div>
+  <datalist id="listaEstaciones"></datalist>
+  <button id="verEstacion" class="view-button" type="button">Ver estación</button>
+</nav>
 
 <div id="map"></div>
 
 <div id="leyenda" class="leyenda-container floating-ctrl">
-  <div class="leyenda-item">
-    <span class="dot" style="background:purple;"></span>
-    <span>Wunderground</span>
-  </div>
-  <div class="leyenda-item">
-    <span class="dot" style="background:green;"></span>
-    <span>Cumulus</span>
-  </div>
-  <div class="leyenda-item">
-    <span class="dot" style="background:#1E90FF;"></span>
-    <span>WeatherLink</span>
-  </div>
-  <div class="leyenda-item">
-    <span class="dot" style="background:#FF4500;"></span>
-    <span>Fuera de línea / Error</span>
-  </div>
+  <div class="legend-title">Red de estaciones</div>
+  <div class="leyenda-item"><span class="dot" style="background:purple;"></span><span>Wunderground</span></div>
+  <div class="leyenda-item"><span class="dot" style="background:green;"></span><span>Cumulus</span></div>
+  <div class="leyenda-item"><span class="dot" style="background:#1E90FF;"></span><span>WeatherLink</span></div>
+  <div class="leyenda-item"><span class="dot" style="background:#FF4500;"></span><span>Fuera de línea / Error</span></div>
 </div>
 
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-
-// ======= LISTA COMPLETA DE ESTACIONES =======  
 const estaciones = [
-
-// ======= CUARZONA =======
   { nombre: "Estación Capitanía de Puerto de Arica", lat: -18.47672398628623, lng: -70.32197533176908, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/arica" },
-
   { nombre: "Estación Alcaldía de mar Pisagua", lat: -19.35, lng: -70.12, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/pisagua" },
   { nombre: "Estación Gobernación Marítima de Iquique", lat: -20.1240, lng: -70.0912, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/iquique" },
   { nombre: "Estación Capitanía de Puerto de Patache", lat: -20.4758, lng: -70.1116, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/patache" },
   { nombre: "Estación Capitanía de Puerto de Tocopilla", lat: -22.0531, lng: -70.1152, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/tocopilla" },
   { nombre: "Estación Capitanía de Puerto de Mejillones", lat: -23.0551, lng: -70.2721, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/mejillones" },
   { nombre: "Estación Capitanía de Puerto de Taltal", lat: -25.2427, lng: -70.2928, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/taltal" },
-
-// ======= PRIZONA =======
   { nombre: "Estación Capitanía de Puerto de Chañaral", lat: -26.3518, lng: -70.6311, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/chanaral" },
-  { nombre: "Estación Capitanía de Puerto de Caldera", lat: -27.06557, lng: -70.8232, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/Caldera" }, 
+  { nombre: "Estación Capitanía de Puerto de Caldera", lat: -27.06557, lng: -70.8232, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/Caldera" },
   { nombre: "Estación Capitanía de Puerto de Hanga Roa", lat: -27.1498, lng: -109.4371, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/pascua" },
   { nombre: "Estación Capitanía de Puerto de Huasco", lat: -28.4616, lng: -71.2263, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/huasco" },
-  { nombre: "Estación Faro Punta Tortuga", lat: -29.9340, lng: -71.3426, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/tortuga" }, 
+  { nombre: "Estación Faro Punta Tortuga", lat: -29.9340, lng: -71.3426, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/tortuga" },
   { nombre: "Estación Capitanía de Puerto Los Vilos", lat: -31.9092, lng: -71.5136, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/losvilos" },
-  { nombre: "Estación Capitanía de Puerto de Quintero", lat: -32.7763, lng: -71.5267, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/quintero" }, 
-  { nombre: "Estación Capitanía de Puerto de Valparaiso", lat: -33.0318, lng: -71.6207, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/valparaiso" }, 
+  { nombre: "Estación Capitanía de Puerto de Quintero", lat: -32.7763, lng: -71.5267, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/quintero" },
+  { nombre: "Estación Capitanía de Puerto de Valparaiso", lat: -33.0318, lng: -71.6207, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/valparaiso" },
   { nombre: "Estación Faro Punta Panul", lat: -33.5749, lng: -71.6251, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/Panul" },
   { nombre: "Estación Capitanía de Puerto de Juan Fernandez", lat: -33.6380, lng: -78.8450, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/cumberland" },
-  { nombre: "Estación Capitanía de Puerto de Pichilemu", lat: -34.3849, lng: -72.0085, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/Pichilemu" },  
-
-// ======= WEATHERLINK =======
-
-  { nombre: "Club de Yates Recreo (Viña del Mar)", lat: -33.0258, lng: -71.5818, tipo: "weatherlink", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/davis-Recreo" },    
-  { nombre: "Dique Flotante Valparaíso III", lat: -33.0379, lng: -71.6232, tipo: "weatherlink", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/davis-diqueIII" }, 
-  { nombre: "WL Chilquinta Muelle Barón (Valparaíso)", lat: -33.0407, lng: -71.6083, tipo: "weatherlink", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/davis-baron" },  
-      { nombre: "Cofradía Náutica del Pacífico (Algarrobo)", lat: -33.3621, lng: -71.6854, tipo: "weatherlink", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/davis-Algarrobo" },    
-
-// ======= SEZONA =======
-  { nombre: "Estación Capitanía de Puerto de Corral", lat: -39.8877, lng: -73.4278, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/corral" },    
+  { nombre: "Estación Capitanía de Puerto de Pichilemu", lat: -34.3849, lng: -72.0085, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/Pichilemu" },
+  { nombre: "Club de Yates Recreo (Viña del Mar)", lat: -33.0258, lng: -71.5818, tipo: "weatherlink", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/davis-Recreo" },
+  { nombre: "Dique Flotante Valparaíso III", lat: -33.0379, lng: -71.6232, tipo: "weatherlink", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/davis-diqueIII" },
+  { nombre: "WL Chilquinta Muelle Barón (Valparaíso)", lat: -33.0407, lng: -71.6083, tipo: "weatherlink", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/davis-baron" },
+  { nombre: "Cofradía Náutica del Pacífico (Algarrobo)", lat: -33.3621, lng: -71.6854, tipo: "weatherlink", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/davis-Algarrobo" },
+  { nombre: "Estación Capitanía de Puerto de Corral", lat: -39.8877, lng: -73.4278, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/corral" },
   { nombre: "Estación Capitanía de Puerto de Carahue", lat: -38.7884, lng: -73.3971, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/carahue" },
-  { nombre: "Estación Capitanía de Puerto de Lebu", lat: -37.6048, lng: -73.6537, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/lebu" },    
-  { nombre: "Estación Capitanía de Puerto de Lota", lat: -37.0971, lng: -73.1594, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/lota" }, 
-  { nombre: "Estación Capitanía de Puerto de Coronel", lat: -37.0273, lng: -73.1488, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/coronel" }, 
-  { nombre: "Estación Centro Meteorológico de Talcahuano", lat: -36.7079, lng: -73.1134, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/talcahuano" },  
-  { nombre: "Estación Capitanía de Puerto de Lirquén", lat: -36.7113, lng: -72.9777, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/lirquen" }, 
+  { nombre: "Estación Capitanía de Puerto de Lebu", lat: -37.6048, lng: -73.6537, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/lebu" },
+  { nombre: "Estación Capitanía de Puerto de Lota", lat: -37.0971, lng: -73.1594, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/lota" },
+  { nombre: "Estación Capitanía de Puerto de Coronel", lat: -37.0273, lng: -73.1488, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/coronel" },
+  { nombre: "Estación Centro Meteorológico de Talcahuano", lat: -36.7079, lng: -73.1134, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/talcahuano" },
+  { nombre: "Estación Capitanía de Puerto de Lirquén", lat: -36.7113, lng: -72.9777, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/lirquen" },
   { nombre: "Estación Capitanía de Puerto de Constitución", lat: -35.3243, lng: -72.4084, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/costitucion" },
-
-// ===== WUNDERGROUND (ITALCA) =====  
-{ nombre: "Estación Faro Isla Quiriquina", lat: -36.6115, lng: -73.0524, tipo: "italca", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/quiriquina" },
-  { nombre: "Estación Faro Punta Hualpén", lat: -36.7469, lng: -73.1913, tipo: "italca", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/hualpen" },  
-
-// ======= QUINZONA =======
-  { nombre: "Estación Quinzona - Isla Tenglo", lat: -41.48661084352241, lng: -72.9512652000025, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/quinzona" },  
+  { nombre: "Estación Faro Isla Quiriquina", lat: -36.6115, lng: -73.0524, tipo: "italca", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/quiriquina" },
+  { nombre: "Estación Faro Punta Hualpén", lat: -36.7469, lng: -73.1913, tipo: "italca", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/hualpen" },
+  { nombre: "Estación Quinzona - Isla Tenglo", lat: -41.48661084352241, lng: -72.9512652000025, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/quinzona" },
   { nombre: "Estación Alcaldía de mar Chacao", lat: -41.8294, lng: -73.5186, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/alcamarchacao" },
   { nombre: "Estación Capitanía de Puerto de Maullín", lat: -41.6156, lng: -73.5954, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/maullin" },
   { nombre: "Estación Capitanía de Puerto de Ancud", lat: -41.8662, lng: -73.8310, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/ancud" },
@@ -241,298 +142,291 @@ const estaciones = [
   { nombre: "Estación Capitanía de Puerto de Chonchi", lat: -42.6186, lng: -73.7689, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/chonchi" },
   { nombre: "Estación Capitanía de Puerto de Chaitén", lat: -42.9147, lng: -72.7120, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/chaiten" },
   { nombre: "Estación Capitanía de Puerto de Quellón", lat: -43.1206, lng: -73.6216, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/quellon" },
-
   { nombre: "Club Náutico Reloncaví", lat: -41.4990, lng: -72.9881, tipo: "weatherlink", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/davis-reloncavi" },
   { nombre: "Alcaldía De Mar Tabón", lat: -41.91093767973031, lng: -73.13828997867896, tipo: "weatherlink", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/davis-tabon" },
-
-
   { nombre: "Caleta La Arena", lat: -41.691549839025065, lng: -72.64180999361956, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/pcFPvOKrhY6669s5Bu4fo3bFnqTagixd" },
   { nombre: "Caleta Puelche", lat: -41.73859367436766, lng: -72.64759326586844, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/pcFPvOKrhY6669s5Bu4fo3bFnqTagixd" },
   { nombre: "Portuaria Cabo Froward", lat: -42.73859367436766, lng: -72.64759326586844, tipo: "weatherlink", urlDatos: "https://corsproxy.io/?https://www.weatherlink.com/embeddablePage/getData/w9pY7INxB8Eu2TfFCXvI7kBlTOfP8tyD" },
-
-// ======= TERZONA =======
-
-{ nombre: "Estación Alcaldía de mar Timbales", lat: -54.5308, lng: -70.1300, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/timbales" },
+  { nombre: "Estación Alcaldía de mar Timbales", lat: -54.5308, lng: -70.1300, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/timbales" },
   { nombre: "Estación Alcaldía de mar Navarino", lat: -54.5532, lng: -68.1926, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/navarino" },
   { nombre: "Estación Capitanía de Puerto Edén", lat: -49.0745, lng: -74.2545, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/eden" },
   { nombre: "Estación Alcaldía de mar corrientes", lat: -54.5919, lng: -68.2040, tipo: "normal", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/corrientes" },
-
-// ======= WEATHERLINK =======
-
-  { nombre: "Muelle Capitán Guillermos Punta Arenas", lat: -53.136, lng: -70.887, tipo: "weatherlink", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/davis-MuellePuntaArenas" }, 
+  { nombre: "Muelle Capitán Guillermos Punta Arenas", lat: -53.136, lng: -70.887, tipo: "weatherlink", urlDatos: "https://meteorologia-api.salaspancho16.workers.dev/davis-MuellePuntaArenas" }
 ];
 
-// ======= GRUPOS =======
-const grupoCuarzona = [ "Estación Capitanía de Puerto de Arica", "Estación Alcaldía de mar Pisagua", "Estación Gobernación Marítima de Iquique", "Estación Capitanía de Puerto de Patache", "Estación Capitanía de Puerto de Tocopilla", "Estación Capitanía de Puerto de Mejillones", "Estación Capitanía de Puerto de Taltal" ];
-const grupoPrizona = [ "Estación Capitanía de Puerto de Chañaral", "Estación Capitanía de Puerto de Caldera", "Estación Capitanía de Puerto de Hanga Roa", "Estación Capitanía de Puerto de Huasco", "Estación Faro Punta Tortuga", "Estación Capitanía de Puerto Los Vilos", "Estación Capitanía de Puerto de Quintero", "Estación Capitanía de Puerto de Valparaiso", "Estación Faro Punta Panul", "Estación Capitanía de Puerto de Juan Fernandez", "Estación Capitanía de Puerto de Pichilemu", "Club de Yates Recreo (Viña del Mar)", "WL Chilquinta Muelle Barón (Valparaíso)", "Dique Flotante Valparaíso III", "Cofradía Náutica del Pacífico (Algarrobo)" ];
-const grupoSezona = [ "Estación Capitanía de Puerto de Corral", "Estación Capitanía de Puerto de Carahue", "Estación Capitanía de Puerto de Lebu", "Estación Capitanía de Puerto de Lota", "Estación Capitanía de Puerto de Coronel", "Estación Centro Meteorológico de Talcahuano", "Estación Capitanía de Puerto de Lirquén", "Estación Capitanía de Puerto de Constitución", "Estación Faro Isla Quiriquina", "Estación Faro Punta Hualpén" ];
-const grupoQuinzona = [ "Estación Quinzona - Isla Tenglo", "Club Náutico Reloncaví", "Estación Capitanía de Puerto de Maullín", "Estación Alcaldía de mar Chacao", "Estación Capitanía de Puerto de Ancud", "Estación Capitanía de Puerto de Quemchi", "Estación Capitanía de Puerto de Chonchi", "Estación Capitanía de Puerto de Chaitén", "Estación Capitanía de Puerto de Quellón", "Estación Capitanía de Puerto de Melinka", "Estación Capitanía de Puerto de Aguirre", "Estación Capitanía de Puerto de Chacabuco", "Alcaldía De Mar Tabón", "Caleta Puelche", "Caleta La Arena", "Portuaria Cabo Froward" ];
-const grupoTerzona = [ "Estación Alcaldía de mar Timbales", "Estación Alcaldía de mar Navarino", "Estación Capitanía de Puerto Edén", "Estación Alcaldía de mar corrientes", "Muelle Capitán Guillermos Punta Arenas" ];
+const grupoCuarzona = [
+  "Estación Capitanía de Puerto de Arica","Estación Alcaldía de mar Pisagua","Estación Gobernación Marítima de Iquique",
+  "Estación Capitanía de Puerto de Patache","Estación Capitanía de Puerto de Tocopilla","Estación Capitanía de Puerto de Mejillones",
+  "Estación Capitanía de Puerto de Taltal"
+];
+const grupoPrizona = [
+  "Estación Capitanía de Puerto de Chañaral","Estación Capitanía de Puerto de Caldera","Estación Capitanía de Puerto de Hanga Roa",
+  "Estación Capitanía de Puerto de Huasco","Estación Faro Punta Tortuga","Estación Capitanía de Puerto Los Vilos",
+  "Estación Capitanía de Puerto de Quintero","Estación Capitanía de Puerto de Valparaiso","Estación Faro Punta Panul",
+  "Estación Capitanía de Puerto de Juan Fernandez","Estación Capitanía de Puerto de Pichilemu",
+  "Club de Yates Recreo (Viña del Mar)","WL Chilquinta Muelle Barón (Valparaíso)","Dique Flotante Valparaíso III",
+  "Cofradía Náutica del Pacífico (Algarrobo)"
+];
+const grupoSezona = [
+  "Estación Capitanía de Puerto de Corral","Estación Capitanía de Puerto de Carahue","Estación Capitanía de Puerto de Lebu",
+  "Estación Capitanía de Puerto de Lota","Estación Capitanía de Puerto de Coronel","Estación Centro Meteorológico de Talcahuano",
+  "Estación Capitanía de Puerto de Lirquén","Estación Capitanía de Puerto de Constitución","Estación Faro Isla Quiriquina",
+  "Estación Faro Punta Hualpén"
+];
+const grupoQuinzona = [
+  "Estación Quinzona - Isla Tenglo","Club Náutico Reloncaví","Estación Capitanía de Puerto de Maullín",
+  "Estación Alcaldía de mar Chacao","Estación Capitanía de Puerto de Ancud","Estación Capitanía de Puerto de Quemchi",
+  "Estación Capitanía de Puerto de Chonchi","Estación Capitanía de Puerto de Chaitén","Estación Capitanía de Puerto de Quellón",
+  "Estación Capitanía de Puerto de Melinka","Estación Capitanía de Puerto de Aguirre","Estación Capitanía de Puerto de Chacabuco",
+  "Alcaldía De Mar Tabón","Caleta Puelche","Caleta La Arena","Portuaria Cabo Froward"
+];
+const grupoTerzona = [
+  "Estación Alcaldía de mar Timbales","Estación Alcaldía de mar Navarino","Estación Capitanía de Puerto Edén",
+  "Estación Alcaldía de mar corrientes","Muelle Capitán Guillermos Punta Arenas"
+];
 
-
-// ======= FUNCIONES AUXILIARES =======
 function convertirGradosAPuntoCardinal(grados){
-  const direcciones = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+  const direcciones=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
   return direcciones[Math.round(grados/22.5)%16];
 }
 
-async function cargarDatosITALCA20(urlDatos, nombre){
-  try {
-    const response = await fetch(urlDatos);
-    
-    if (!response.ok) {
-      throw new Error(`Error de conexión: ${response.status}`);
-    }
+async function cargarDatosITALCA20(urlDatos,nombre){
+  try{
+    const response=await fetch(urlDatos);
+    if(!response.ok) throw new Error(`Error de conexión: ${response.status}`);
+    const data=await response.json();
+    if(!data||!data.observations||data.observations.length===0) throw new Error("Estación fuera de línea (sin datos).");
 
-    const data = await response.json();
+    const obs=data.observations[0];
+    const fechaObj=new Date(obs.obsTimeLocal);
+    const dia=String(fechaObj.getDate()).padStart(2,'0');
+    const mes=String(fechaObj.getMonth()+1).padStart(2,'0');
+    const año=fechaObj.getFullYear();
+    const hora=String(fechaObj.getHours()).padStart(2,'0')+':'+String(fechaObj.getMinutes()).padStart(2,'0');
+    const direccionCardinal=convertirGradosAPuntoCardinal(obs.winddir||0);
+    if(!obs.imperial) throw new Error("Formato de datos incorrecto de Wunderground.");
 
-    if (!data || !data.observations || data.observations.length === 0) {
-      throw new Error("Estación fuera de línea (sin datos).");
-    }
+    const velocidadNudos=(obs.imperial.windSpeed*0.868976).toFixed(1);
+    const rachasNudos=(obs.imperial.windGust*0.868976).toFixed(1);
+    const temperaturaC=((obs.imperial.temp-32)*5/9).toFixed(1);
+    const puntoRocioC=((obs.imperial.dewpt-32)*5/9).toFixed(1);
+    const presionhPa=(obs.imperial.pressure*33.8639).toFixed(1);
+    const humedad=obs.humidity;
+    const lluviaMm=((obs.imperial.precipTotal||0)*25.4).toFixed(1);
 
-    const obs = data.observations[0];
-    const fechaObj = new Date(obs.obsTimeLocal);
-    const dia = String(fechaObj.getDate()).padStart(2,'0');
-    const mes = String(fechaObj.getMonth()+1).padStart(2,'0');
-    const año = fechaObj.getFullYear();
-    const hora = String(fechaObj.getHours()).padStart(2,'0') + ':' + String(fechaObj.getMinutes()).padStart(2,'0');
-    
-    const direccionGrados = obs.winddir || 0;
-    const direccionCardinal = convertirGradosAPuntoCardinal(direccionGrados);
-    
-    if(!obs.imperial) {
-       throw new Error("Formato de datos incorrecto de Wunderground.");
-    }
-
-    const velocidadNudos = (obs.imperial.windSpeed * 0.868976).toFixed(1);
-    const rachasNudos = (obs.imperial.windGust * 0.868976).toFixed(1);
-    const temperaturaC = ((obs.imperial.temp - 32) * 5/9).toFixed(1);
-    const puntoRocioC = ((obs.imperial.dewpt - 32) * 5/9).toFixed(1);
-    const presionhPa = (obs.imperial.pressure * 33.8639).toFixed(1);
-    const humedad = obs.humidity;
-    
-    // Extracción y conversión de lluvia (de pulgadas a milímetros)
-    const lluviaPulgadas = obs.imperial.precipTotal || 0;
-    const lluviaMm = (lluviaPulgadas * 25.4).toFixed(1);
-
-    return `
-      <div class="popup-card">
-        <div class="titulo">📡 ${nombre}</div>
-        <div class="dato" style="justify-content:center; color:#555;">📅 Act: ${dia}/${mes}/${año} ${hora}</div>
-        <hr>
-        <div class="dato"><span class="label">🌡 Temp:</span> ${temperaturaC} °C</div>
-        <div class="dato"><span class="label">💧 Humedad:</span> ${humedad} %</div>
-        <div class="dato"><span class="label">🌫 Rocío:</span> ${puntoRocioC} °C</div>
-        <div class="dato"><span class="label">🧭 Presión:</span> ${presionhPa} hPa</div>
-        <div class="dato"><span class="label">🌬 Viento:</span> ${direccionCardinal} ${velocidadNudos} nds</div>
-        <div class="dato"><span class="label">💨 Rachas:</span> ${rachasNudos} nds</div>
-        <div class="dato"><span class="label">🌧️ Lluvia:</span> ${lluviaMm} mm</div>
-      </div>`;
-      
-  } catch(e) { 
-    console.error(`Fallo en ${nombre}:`, e);
-    return `
-      <div class='popup-card'>
-        <div class="titulo" style="background:#d90429;">⚠️ ${nombre}</div>
-        <div class="dato" style="justify-content:center; color:#d90429; font-weight:bold;">
-           Error: ${e.message}
-        </div>
-      </div>`; 
+    return `<div class="popup-card">
+      <div class="titulo">📡 ${nombre}</div>
+      <div class="dato" style="justify-content:center;color:#555;">📅 Act: ${dia}/${mes}/${año} ${hora}</div><hr>
+      <div class="dato"><span class="label">🌡 Temp:</span> ${temperaturaC} °C</div>
+      <div class="dato"><span class="label">💧 Humedad:</span> ${humedad} %</div>
+      <div class="dato"><span class="label">🌫 Rocío:</span> ${puntoRocioC} °C</div>
+      <div class="dato"><span class="label">🧭 Presión:</span> ${presionhPa} hPa</div>
+      <div class="dato"><span class="label">🌬 Viento:</span> ${direccionCardinal} ${velocidadNudos} nds</div>
+      <div class="dato"><span class="label">💨 Rachas:</span> ${rachasNudos} nds</div>
+      <div class="dato"><span class="label">🌧️ Lluvia:</span> ${lluviaMm} mm</div>
+    </div>`;
+  }catch(e){
+    console.error(`Fallo en ${nombre}:`,e);
+    return `<div class="popup-card"><div class="titulo" style="background:#d90429;">⚠️ ${nombre}</div>
+      <div class="dato" style="justify-content:center;color:#d90429;font-weight:bold;">Error: ${e.message}</div></div>`;
   }
 }
 
-async function cargarDatos(urlDatos, nombre){
+async function cargarDatos(urlDatos,nombre){
   try{
-    const response = await fetch(urlDatos);
-    const texto = await response.text();
-    const lineas = texto.trim().split('\n');
-    const ultimaLinea = lineas[lineas.length-1];
-    const datos = ultimaLinea.trim().split(/\s+/);
-    const fecha = datos[0] || "-";
-    const hora = datos[1] || "-";
-    const direccionGrados = parseFloat(datos[7]||0);
-    const intensidadNudos = datos[5]||0;
-    const direccionCardinal = convertirGradosAPuntoCardinal(direccionGrados);
-    return `
-      <div class="popup-card">
-        <div class="titulo">📡 ${nombre}</div>
-        <div class="dato" style="justify-content:center; color:#555;">📅 Act: ${fecha} ${hora}</div>
-        <hr>
-        <div class="dato"><span class="label">🌡 Temp:</span> ${datos[2]||"-"} °C</div>
-        <div class="dato"><span class="label">💧 Humedad:</span> ${datos[3]||"-"} %</div>
-        <div class="dato"><span class="label">🌫 Rocío:</span> ${datos[4]||"-"} °C</div>
-        <div class="dato"><span class="label">🧭 Presión:</span> ${datos[10]||"-"} hPa</div>
-        <div class="dato"><span class="label">🌬 Viento:</span> ${direccionCardinal} ${intensidadNudos} nds</div>
-        <div class="dato"><span class="label">💨 Rachas:</span> ${datos[40]||"-"} nds</div>
-        <div class="dato"><span class="label">🌧️ Lluvia:</span> ${datos[9]||"-"} mm</div>
-      </div>`;
-  }catch(e){ return "<div class='popup-card'>Error al cargar los datos.</div>"; }
+    const response=await fetch(urlDatos);
+    if(!response.ok) throw new Error(`Error de conexión: ${response.status}`);
+    const texto=await response.text();
+    const lineas=texto.trim().split('\n');
+    const datos=lineas[lineas.length-1].trim().split(/\s+/);
+    const fecha=datos[0]||"-";
+    const hora=datos[1]||"-";
+    const direccionCardinal=convertirGradosAPuntoCardinal(parseFloat(datos[7]||0));
+    const intensidadNudos=datos[5]||0;
+
+    return `<div class="popup-card">
+      <div class="titulo">📡 ${nombre}</div>
+      <div class="dato" style="justify-content:center;color:#555;">📅 Act: ${fecha} ${hora}</div><hr>
+      <div class="dato"><span class="label">🌡 Temp:</span> ${datos[2]||"-"} °C</div>
+      <div class="dato"><span class="label">💧 Humedad:</span> ${datos[3]||"-"} %</div>
+      <div class="dato"><span class="label">🌫 Rocío:</span> ${datos[4]||"-"} °C</div>
+      <div class="dato"><span class="label">🧭 Presión:</span> ${datos[10]||"-"} hPa</div>
+      <div class="dato"><span class="label">🌬 Viento:</span> ${direccionCardinal} ${intensidadNudos} nds</div>
+      <div class="dato"><span class="label">💨 Rachas:</span> ${datos[40]||"-"} nds</div>
+      <div class="dato"><span class="label">🌧️ Lluvia:</span> ${datos[9]||"-"} mm</div>
+    </div>`;
+  }catch(e){
+    return `<div class="popup-card">Error al cargar los datos: ${e.message}</div>`;
+  }
 }
 
-async function cargarDatosWeatherLink(urlDatos, nombre){
+async function cargarDatosWeatherLink(urlDatos,nombre){
   try{
-    const response = await fetch(urlDatos);
-    let datos = await response.json();
-    let ultimaAct;
-    if(datos.ts || datos.time){
-      const ts = new Date(datos.ts || datos.time);
-      ultimaAct = ts.toLocaleString("es-CL", {hour12:false});
-    } else {
-      ultimaAct = new Date().toLocaleString("es-CL", {hour12:false});
-    }
-    const dir = datos.windDirection || 0;
-    const spd = datos.wind || 0;
-    const racha = datos.gust || 0;
-    return `
-      <div class="popup-card">
-        <div class="titulo">🌐 ${nombre}</div>
-        <div class="dato" style="justify-content:center; color:#555;">📅 Act: ${ultimaAct}</div>
-        <hr>
-        <div class="dato"><span class="label">🌡 Temp:</span> ${datos.temperature || "-"} °C</div>
-        <div class="dato"><span class="label">💧 Humedad:</span> ${datos.humidity || "-"} %</div>
-        <div class="dato"><span class="label">🧭 Presión:</span> ${datos.barometer || "-"} hPa</div>
-        <div class="dato"><span class="label">🌬 Viento:</span> ${convertirGradosAPuntoCardinal(dir)} ${spd} nds</div>
-        <div class="dato"><span class="label">💨 Rachas:</span> ${racha} nds</div>
-        <div class="dato"><span class="label">🌧️ Lluvia:</span> ${datos.rain || "-"} mm</div>
-      </div>`;
-  }catch(e){ return "<div class='popup-card'>Error al cargar WeatherLink</div>"; }
+    const response=await fetch(urlDatos);
+    if(!response.ok) throw new Error(`Error de conexión: ${response.status}`);
+    const datos=await response.json();
+    const ultimaAct=(datos.ts||datos.time)
+      ? new Date(datos.ts||datos.time).toLocaleString("es-CL",{hour12:false})
+      : new Date().toLocaleString("es-CL",{hour12:false});
+
+    return `<div class="popup-card">
+      <div class="titulo">🌐 ${nombre}</div>
+      <div class="dato" style="justify-content:center;color:#555;">📅 Act: ${ultimaAct}</div><hr>
+      <div class="dato"><span class="label">🌡 Temp:</span> ${datos.temperature||"-"} °C</div>
+      <div class="dato"><span class="label">💧 Humedad:</span> ${datos.humidity||"-"} %</div>
+      <div class="dato"><span class="label">🧭 Presión:</span> ${datos.barometer||"-"} hPa</div>
+      <div class="dato"><span class="label">🌬 Viento:</span> ${convertirGradosAPuntoCardinal(datos.windDirection||0)} ${datos.wind||0} nds</div>
+      <div class="dato"><span class="label">💨 Rachas:</span> ${datos.gust||0} nds</div>
+      <div class="dato"><span class="label">🌧️ Lluvia:</span> ${datos.rain||"-"} mm</div>
+    </div>`;
+  }catch(e){
+    return `<div class="popup-card">Error al cargar WeatherLink: ${e.message}</div>`;
+  }
 }
 
+// Mapa base y vista satelital.
+const callejero=L.tileLayer(
+  'https://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+  {maxZoom:19,attribution:'Tiles © Esri — Sources: Esri, HERE, Garmin, © OpenStreetMap contributors'}
+);
+const satelite=L.tileLayer(
+  'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+  {maxZoom:19,attribution:'Imagery © Esri and its contributors'}
+);
+const map=L.map('map',{layers:[callejero]}).setView([-41.5,-73],7);
+L.control.layers({"Mapa callejero":callejero,"Satélite":satelite},null,{position:'topright'}).addTo(map);
 
-// ======= MAPA =======
-const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19 });
-const googleSat = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', { maxZoom: 20, attribution: '© Google' });
-const map = L.map('map',{layers:[osm]}).setView([-41.5,-73],7);
-L.control.layers({"Mapa":osm,"Satélite Google":googleSat},null,{position:'topleft'}).addTo(map);
-
-const tituloControlBottom = L.control({position:'bottomleft'});
-tituloControlBottom.onAdd=function(map){ 
-  const div = L.DomUtil.create('div','map-title-bottom'); 
-  div.innerHTML='<h2>Estaciones Meteorológicas Automáticas</h2>'; 
-  return div; 
-};
-tituloControlBottom.addTo(map);
-
-let marcadores = [];
+let marcadores=[];
 
 async function mostrarEstaciones(lista){
-  marcadores.forEach(m => map.removeLayer(m));
-  marcadores = [];
+  marcadores.forEach(m=>map.removeLayer(m));
+  marcadores=[];
 
-  lista.forEach(est => {
-    const colorMarcador = (est.tipo === "italca") ? "purple" : (est.tipo === "weatherlink") ? "#1E90FF" : "green";
-
-    const marker = L.circleMarker([est.lat, est.lng], {
-      radius: 10,
-      color: "#ffffff",
-      fillColor: colorMarcador,
-      fillOpacity: 0.8,
-      weight: 2
+  lista.forEach(est=>{
+    const colorMarcador=est.tipo==="italca"?"purple":est.tipo==="weatherlink"?"#1E90FF":"green";
+    const marker=L.circleMarker([est.lat,est.lng],{
+      radius:10,color:"#fff",fillColor:colorMarcador,fillOpacity:.8,weight:2
     }).addTo(map);
+    marker.estacion=est;
 
-    // --- NUEVO: NOMBRE AL PASAR EL MOUSE (Tooltip) ---
-    marker.bindTooltip(est.nombre, { 
-        direction: 'top', 
-        offset: [0, -10], 
-        className: 'custom-tooltip' 
-    });
-
-    // --- NUEVO: RESALTE AL PASAR EL MOUSE (Efecto Visual) ---
-    marker.on('mouseover', function (e) {
-      this.setRadius(14); // Agranda el círculo
-      this.setStyle({ weight: 4, fillOpacity: 1 });
-    });
-
-    marker.on('mouseout', function (e) {
-      this.setRadius(10); // Vuelve al tamaño normal
-      this.setStyle({ weight: 2, fillOpacity: 0.8 });
-    });
-
+    marker.bindTooltip(est.nombre,{direction:'top',offset:[0,-10],className:'custom-tooltip'});
+    marker.on('mouseover',function(){this.setRadius(14);this.setStyle({weight:4,fillOpacity:1});});
+    marker.on('mouseout',function(){this.setRadius(10);this.setStyle({weight:2,fillOpacity:.8});});
     marcadores.push(marker);
 
-    // Verificar si está fuera de línea (Lógica original)
+    // Marca en naranja las estaciones sin actualización reciente.
     (async()=>{
       let ultimaFecha;
-      try {
-        if(est.tipo === "weatherlink"){
-          const response = await fetch(est.urlDatos);
-          const datos = await response.json();
-          const ts = datos.ts || datos.time;
-          if(ts) ultimaFecha = new Date(ts);
-        } else if(est.tipo === "italca") {
-           // Omitido para ITALCA según original
-        } else {
-          const response = await fetch(est.urlDatos);
-          const texto = await response.text();
-          const lineas = texto.trim().split('\n');
-          const ultimaLinea = lineas[lineas.length-1];
-          const datos = ultimaLinea.trim().split(/\s+/);
-          const fecha = datos[0] || "-";
-          const hora = datos[1] || "-";
-          if(fecha !== "-" && hora !== "-"){
-            const partes = fecha.split("-");
-            const dia = parseInt(partes[0],10);
-            const mes = parseInt(partes[1],10)-1;
-            let anio = parseInt(partes[2],10);
-            if(anio<100) anio += 2000;
-            const partesHora = hora.split(":");
-            const horas = parseInt(partesHora[0],10);
-            const minutos = parseInt(partesHora[1],10);
-            const segundos = parseInt(partesHora[2],10);
-            ultimaFecha = new Date(anio, mes, dia, horas, minutos, segundos);
+      try{
+        const response=await fetch(est.urlDatos);
+        if(!response.ok) return;
+
+        if(est.tipo==="weatherlink"){
+          const datos=await response.json();
+          const ts=datos.ts||datos.time;
+          if(ts) ultimaFecha=new Date(ts);
+        }else if(est.tipo!=="italca"){
+          const texto=await response.text();
+          const lineas=texto.trim().split('\n');
+          const datos=lineas[lineas.length-1].trim().split(/\s+/);
+          const fecha=datos[0]||"-";
+          const hora=datos[1]||"-";
+          if(fecha!=="-"&&hora!=="-"){
+            const partes=fecha.split("-");
+            const dia=parseInt(partes[0],10);
+            const mes=parseInt(partes[1],10)-1;
+            let anio=parseInt(partes[2],10);
+            if(anio<100) anio+=2000;
+            const partesHora=hora.split(":");
+            ultimaFecha=new Date(anio,mes,dia,parseInt(partesHora[0],10),parseInt(partesHora[1],10),parseInt(partesHora[2],10));
           }
         }
-      } catch(e){ }
+      }catch(e){}
 
-      if(ultimaFecha){
-        const diffMin = (new Date() - ultimaFecha)/1000/60;
-        if(diffMin>10){
-          marker.setStyle({color:"#ffffff", fillColor:"#FF4500"}); // Naranja si está caído
-        }
+      if(ultimaFecha&&(new Date()-ultimaFecha)/60000>10){
+        marker.setStyle({color:"#fff",fillColor:"#FF4500"});
       }
     })();
 
-    marker.on('click', async ()=> {
+    marker.on('click',async()=>{
       let contenido;
-      if(est.tipo==="italca"){
-        contenido = await cargarDatosITALCA20(est.urlDatos, est.nombre);
-      } else if(est.tipo==="weatherlink"){
-        contenido = await cargarDatosWeatherLink(est.urlDatos, est.nombre);
-      } else {
-        contenido = await cargarDatos(est.urlDatos, est.nombre);
-      }
+      if(est.tipo==="italca") contenido=await cargarDatosITALCA20(est.urlDatos,est.nombre);
+      else if(est.tipo==="weatherlink") contenido=await cargarDatosWeatherLink(est.urlDatos,est.nombre);
+      else contenido=await cargarDatos(est.urlDatos,est.nombre);
       marker.bindPopup(contenido).openPopup();
     });
   });
 }
 
-// ======= FILTRO =======
-document.getElementById("filtroEstaciones").addEventListener("change", function(){
-  const valor = this.value.toLowerCase();
-  let listaMostrar;
-  const normalizar = str => str.toLowerCase().trim();
+// Búsqueda y filtro por las cinco zonas.
+let estacionesVisibles=estaciones;
+function normalizarTexto(texto){
+  return texto.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLocaleLowerCase("es").trim();
+}
+function aplicarBusqueda(){
+  const termino=normalizarTexto(document.getElementById("buscarEstacion").value);
+  marcadores.forEach(marker=>{
+    const coincide=!termino||normalizarTexto(marker.estacion.nombre).includes(termino);
+    if(coincide&&!map.hasLayer(marker)) marker.addTo(map);
+    if(!coincide&&map.hasLayer(marker)) map.removeLayer(marker);
+  });
+}
+function actualizarSugerencias(lista){
+  const datalist=document.getElementById("listaEstaciones");
+  datalist.replaceChildren(...lista.map(estacion=>{
+    const opcion=document.createElement("option");
+    opcion.value=estacion.nombre;
+    return opcion;
+  }));
+}
+function estacionesDeZona(valor){
+  const grupos={
+    cuarzona:grupoCuarzona,prizona:grupoPrizona,sezona:grupoSezona,
+    quinzona:grupoQuinzona,terzona:grupoTerzona
+  };
+  const grupo=grupos[valor];
+  if(!grupo) return estaciones;
+  const nombres=new Set(grupo.map(normalizarTexto));
+  return estaciones.filter(estacion=>nombres.has(normalizarTexto(estacion.nombre)));
+}
 
-  if(valor === "todas"){
-    listaMostrar = estaciones;
-  } else if(valor === "cuarzona"){
-    listaMostrar = estaciones.filter(e => grupoCuarzona.some(g => normalizar(g) === normalizar(e.nombre)));
-  } else if(valor === "prizona"){
-    listaMostrar = estaciones.filter(e => grupoPrizona.some(g => normalizar(g) === normalizar(e.nombre)));
-  } else if(valor === "sezona"){
-    listaMostrar = estaciones.filter(e => grupoSezona.some(g => normalizar(g) === normalizar(e.nombre)));
-  } else if(valor === "quinzona"){
-    listaMostrar = estaciones.filter(e => grupoQuinzona.some(g => normalizar(g) === normalizar(e.nombre)));
-  } else if(valor === "terzona"){
-    listaMostrar = estaciones.filter(e => grupoTerzona.some(g => normalizar(g) === normalizar(e.nombre)));
-  } else {
-    listaMostrar = estaciones;
-  }
-  mostrarEstaciones(listaMostrar);
+const campoBusqueda=document.getElementById("buscarEstacion");
+const filtroEstaciones=document.getElementById("filtroEstaciones");
+actualizarSugerencias(estaciones);
+campoBusqueda.addEventListener("input",aplicarBusqueda);
+
+filtroEstaciones.addEventListener("change",function(){
+  estacionesVisibles=estacionesDeZona(this.value);
+  campoBusqueda.value="";
+  mostrarEstaciones(estacionesVisibles);
+  actualizarSugerencias(estacionesVisibles);
 });
 
-// Inicializar
-mostrarEstaciones(estaciones);
+async function verEstacionSeleccionada(){
+  const termino=normalizarTexto(campoBusqueda.value);
+  if(!termino) return;
 
+  const estacion=estacionesVisibles.find(e=>normalizarTexto(e.nombre)===termino)
+    ||estacionesVisibles.find(e=>normalizarTexto(e.nombre).includes(termino));
+  if(!estacion) return;
+
+  let marker=marcadores.find(m=>m.estacion===estacion);
+  if(!marker){
+    estacionesVisibles=[estacion];
+    mostrarEstaciones(estacionesVisibles);
+    marker=marcadores[0];
+  }
+  if(!map.hasLayer(marker)) marker.addTo(map);
+  map.flyTo([estacion.lat,estacion.lng],Math.max(map.getZoom(),11),{duration:.8});
+  marker.fire("click");
+}
+document.getElementById("verEstacion").addEventListener("click",verEstacionSeleccionada);
+campoBusqueda.addEventListener("keydown",event=>{
+  if(event.key==="Enter") verEstacionSeleccionada();
+});
+
+// Inicia mostrando todas las estaciones.
+mostrarEstaciones(estaciones);
 </script>
 </body>
 </html>
